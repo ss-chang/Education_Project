@@ -5,8 +5,7 @@ wh_url <- GET(wh)
 wh_table <- readHTMLTable(rawToChar(wh_url$content), stringsAsFactors = F)
 uni_ranks <- wh_table[[1]]
 
-setwd("~/Desktop/RCSDS/Education_Project_TEST")   # set to wherever you have the data
-dat2 <- read.csv("MERGED2014_15_PP.csv", stringsAsFactors = FALSE)
+dat2 <- read.csv("data/MERGED2014_15_PP.csv", stringsAsFactors = FALSE)
 data <- dat2[,1:20]
 uni_names <- dat2$INSTNM
 
