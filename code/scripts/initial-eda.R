@@ -15,8 +15,18 @@ library(httr)
 # =====================================================================================
 # load data
 # =====================================================================================
-dat <- read.csv("data/2014-15-clean-data.csv", row.names=1,
+dat <- read.csv("../../data/2014-15-clean-data.csv", row.names=1,
                 stringsAsFactors = FALSE)
+
+
+# =====================================================================================
+# Add the University Rankings boolean column
+# =====================================================================================
+
+load("../../data/ranked_universities.RData")
+RANKED <- rank_bool
+
+dat <- cbind(dat, RANKED)
 
 # =====================================================================================
 # Keep only the ICLEVEL is 1: Four-year institutions
@@ -35,6 +45,20 @@ dat_2[is_NULL(dat_2)] = 0
 dat_2[is_PRIVATE(dat_2)] = 0
 dat <- dat_2
 
+# remove our copy
+rm(dat_2) 
+
+
+# =====================================================================================
+# Make MINORITIES column
+# =====================================================================================
+
+MINORITIES <- as.numeric(dat$UGDS_HISP)+
+  as.numeric(dat$UGDS_BLACK)+
+  as.numeric(dat$UGDS_ASIAN)+as.numeric(dat$UGDS_2MOR)
+
+#dat <- cbind(dat, MINORITIES)
+
 # =====================================================================================
 # Make dat_for_pca
 # =====================================================================================
@@ -51,7 +75,8 @@ dat_for_pca <- dat_for_pca[,-which(colnames(dat_for_pca) =="ICLEVEL")]
 pca <- princomp(dat_for_pca)
 screeplot(pca, type = "l")
 
-plot(pca$scores, main = "PCA View of Universities")
+plot(pca$scores, main = "PCA View of Universities",
+     col = dat_for_pca[,"RANKED"]+6)
 
 
 set.seed(16)
@@ -73,36 +98,15 @@ text(pca$loadings[,1],
      pca$loadings[,2],
      colnames(dat_for_pca),
      cex = 0.6)
-# =====================================================================================
-# Make MINORITIES column
-# =====================================================================================
 
-MINORITIES <- as.numeric(dat$UGDS_HISP)+
-  as.numeric(dat$UGDS_BLACK)+
-  as.numeric(dat$UGDS_ASIAN)+as.numeric(dat$UGDS_2MOR)
+random_sample_smaller <- sample(1:nrow(dat), 50, replace = FALSE)
+dat_for_hclust <- dat_for_pca[random_sample_smaller,]
+rownames(dat_for_hclust) <- dat$INSTNM[random_sample_smaller]
 
-# =====================================================================================
-# Make RANKED column
-# =====================================================================================
+d <- dist(dat_for_hclust)
+hc <- hclust(d)
 
-# wh <- "http://www.washingtonpost.com/apps/g/page/local/us-news-college-ranking-trends-2015/1819/"
-# wh_url <- GET(wh)
-# wh_table <- readHTMLTable(rawToChar(wh_url$content), stringsAsFactors = F)
-# uni_ranks1 <- wh_table[[1]]
-# uni_ranks2 <- wh_table[[2]]
-# # create vector of ranked school names
-# ranked_unis <- c(uni_ranks1$Name, uni_ranks2$Name)
-# 
-# inst <- dat$INSTNM
-# inst <- tolower(inst)
-# ranked_unis <- tolower(ranked_unis)
-# 
-# rank_bool <- ranked_unis %in% dat$INSTNM
-# 
-# rank_bool <- as.numeric(rank_bool)
-# 
-# RANKED <- dat$INSTNM %in% ranked_unis + 0
-# 
+plot(hc, cex = 0.7)
 
 # =====================================================================================
 # Make dat_for_lasso
@@ -110,12 +114,16 @@ MINORITIES <- as.numeric(dat$UGDS_HISP)+
 
 # Get rid of all UGDS columns
 dat_for_lasso <- dat_for_pca[,-grep("^UGDS", colnames(dat_for_pca))]
+dat_for_lasso <- scale(dat_for_lasso, T, T)
+
 
 # =====================================================================================
 # LASSO
 # =====================================================================================
 
 lasso <- cv.glmnet(x = as.matrix(dat_for_lasso),
-          y = as.matrix(MINORITIES))
+          y = as.matrix(MINORITIES),
+          nfolds = 5,
+          type.measure = "auc")
 
 coef(lasso)
