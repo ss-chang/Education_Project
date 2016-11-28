@@ -10,7 +10,7 @@
 # =====================================================================================
 
 # select your file
-my_file <- "../MERGED2013_14_PP.csv"
+my_file <- "../MERGED2014_15_PP.csv"
 
 # read in your file
 dat <- read.csv(my_file, row.names = 1)
@@ -37,24 +37,12 @@ remove <- unique(grep(paste(to_remove,collapse="|"),
 # finally, remove the unwanted columns
 matches <- matches[-remove]           
 
+nura_names <- matches
 # keeping matched columns
-rm(nura_dat)
-dat <- dat[,matches]
+#rm(nura_dat)
+#dat <- dat[,matches]
 
-
-# finding null and privacy counts: remove those that are too much
-null_counts <- apply(dat, 2, function(x) sum(x=="NULL"))
-privacy_counts <- apply(dat, 2, function(x) sum(x=="PrivacySuppressed"))
-total_counts <- null_counts + privacy_counts
-
-# keep the ones that are good
-good_vars <- colnames(dat)[total_counts < 5000]
-
-#dat <- dat[,good_vars]   
-
-# nura's column names
-nura_names <- good_vars
-
+print(dim(dat))
 
 # =====================================================================================
 # column selection: Jared
@@ -63,8 +51,6 @@ nura_names <- good_vars
 jared_names <- "ICLEVEL,PREDDEG,CCBASIC,CCUGPROF,CCSIZSET,HBCU,PBI,ANNHI,TRIBAL,AANAPII,HSI,NANTI,AVGFACSAL,INEXPFTE,ADM_RATE,ADM_RATE_ALL,COSTT4_A,COSTT4_P,TUITIONFEE_IN,TUITIONFEE_OUT,TUITIONFEE_PROG,UGDS,UGDS_MEN,UGDS_WOMEN,UGDS_WHITE,UGDS_BLACK,UGDS_HISP,UGDS_ASIAN,UGDS_AIAN,UGDS_NHPI,UGDS_NRA,UGDS_UNKN,PPTUG_EF,PPTUG_EF2,INC_PCT_LO,INC_PCT_M1,INC_PCT_M2,INC_PCT_H1,INC_PCT_H2,RET_FT4,RET_PT4,PAR_ED_PCT_1STGEN,PAR_ED_PCT_MS,PAR_ED_PCT_HS,PAR_ED_PCT_PS,MARRIED,VETERAN,DEPENDENT,FIRST_GEN,FAMINC,MD_FAMINC,FAMINC_IND,PCT_WHITE,PCT_BLACK,PCT_ASIAN,PCT_HISPANIC,PCT_BORN_US,POVERTY_RATE,MEDIAN_HH_INC,UNEMP_RATE,PCTFLOAN,PCTPELL,DEBT_MDN,GRAD_DEBT_MDN,WDRAW_DEBT_MDN,LO_INC_DEBT_MDN,MD_INC_DEBT_MDN,HI_INC_DEBT_MDN,DEP_DEBT_MDN,IND_DEBT_MDN,PELL_DEBT_MDN,NOPELL_DEBT_MDN,GRAD_DEBT_MDN_SUPP,GRAD_DEBT_MDN10YR_SUPP,PCTFLOAN"
 
 jared_names <- strsplit(jared_names, ",")[[1]]
-
-
 
 # =====================================================================================
 # column selection: Manny
@@ -134,49 +120,29 @@ manny_names <- c(
 # column selection: Shannon
 # =====================================================================================
 
-# # select your file
-# my_file <- "../MERGED2014_15_PP.csv"
-# 
-# # read in your file
-# dat <- read.csv(my_file, row.names = 1)
-# 
-# # shannon's columns
-# shannon_dat <- dat[,1500:ncol(dat)] #replace with your columns
-# 
-# # select columns with these names: 
-# pattern <- c("BLACK", "ASIAN", "PELL", "INCOME", "LO", "FIRSTGEN")
-# 
-# # select matches
-# shannon_matches <- unique(grep(paste(pattern,collapse="|"),
-#                                colnames(shannon_dat),
-#                                value = TRUE))
-# 
-# # now remove things that you do not need
-# to_remove <- c("DEATH", "TRANS", "UNKN", "NOPELL", "NOLOAN", "NOTFIRSTGEN")                  
-# 
-# 
-# remove <- unique(grep(paste(to_remove,collapse="|"),
-#                       shannon_matches,
-#                       value = FALSE))
-# 
-# # finally, remove the unwanted columns
-# shannon_matches <- shannon_matches[-remove]
-# 
-
 shannon <- read.csv("../shannon_variables.csv", row.names=1, stringsAsFactors = F)
 shannon <- shannon$x
 
-shannon_names <- shannon
+# =====================================================================================
+# column selection: miscellaneous
+# =====================================================================================
+
+miscellaneous <- c("CONTROL", "NPT4_PUB", "NPT4_PRIV", "NUM4_PUB", "NUM4_PRIV", "COSTT4_P", "COSTT4_A")
+
+
+shannon_names <- c(shannon, miscellaneous)
 # =====================================================================================
 # all columns!
 # =====================================================================================
 
-all_names <- c(nura_names,jared_names,manny_names, shannon_names)
+
+all_names <- c(jared_names,manny_names, shannon_names, nura_names)
 all_names <- unique(all_names)
 
 in_all_names <- which(colnames(dat) %in% all_names)
 dat <- dat[,in_all_names]
 
+dim(dat)
 
 # finding null and privacy counts: remove those that are too much
 null_counts <- apply(dat, 2, function(x) sum(x=="NULL"))
@@ -186,6 +152,9 @@ total_counts <- null_counts + privacy_counts
 # keep the ones that are good
 good_vars <- colnames(dat)[total_counts < 3500]
 
+good_vars <- unique(good_vars)
 
 
+dat <- dat[,good_vars]
 
+write.csv(dat, "data/2014-15-clean-data.csv")
