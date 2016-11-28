@@ -159,5 +159,3 @@ dat <- dat[,good_vars]
 
 write.csv(dat, "data/2014-15-clean-data.csv")
 
-
-source("rename_missing_schools.R")
