@@ -1,3 +1,11 @@
+# =====================================================================================
+# title: rename-missing-schools.R
+# author: Shannon Chang
+# summary: find schools from Washington Post school rankings data that we were not 
+#          able to match with our dataset and rename schools that do exist in our 
+#          main dataset, but were not matched because of slight differences in name
+# =====================================================================================
+
 # select your file
 my_file <- "../../data/MERGED2014_15_PP.csv"
 
