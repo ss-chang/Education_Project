@@ -55,6 +55,7 @@ rm(dat_2)
 
 MINORITIES <- as.numeric(dat$UGDS_HISP)+
   as.numeric(dat$UGDS_BLACK)+
+  + as.numeric(dat$UGDS_AIAN)+
   as.numeric(dat$UGDS_ASIAN)+as.numeric(dat$UGDS_2MOR)
 
 #dat <- cbind(dat, MINORITIES)
@@ -74,10 +75,18 @@ dat_for_pca <- dat_for_pca[,-which(colnames(dat_for_pca) =="ICLEVEL")]
 # =====================================================================================
 pca <- princomp(dat_for_pca)
 screeplot(pca, type = "l")
+my_colors <- c("tomato1", "tomato4")
 
 plot(pca$scores, main = "PCA View of Universities",
-     col = dat_for_pca[,"RANKED"]+6)
-
+     pch = 16,
+     col = my_colors[(dat$RANKED+1)])
+legend("topright",
+       bty = "n",
+       cex = 0.7,
+       #pch = 16,
+       legend = c("Non-Ranked", "Ranked"),
+       title = "RANKED",
+       fill = my_colors)
 
 set.seed(16)
 random_sample <- sample(1:nrow(dat_for_pca), 
@@ -127,3 +136,7 @@ lasso <- cv.glmnet(x = as.matrix(dat_for_lasso),
           type.measure = "auc")
 
 coef(lasso)
+
+
+
+
