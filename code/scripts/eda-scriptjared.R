@@ -29,10 +29,10 @@ library(ape)
 # =====================================================================================
 
 # select file to load
-setwd("~/Desktop/Education_Project/")
+#setwd("~/Desktop/Education_Project/")
 
 # read in your file, call it "dat"
-dat     <- read.csv("complete-data.csv", row.names = 1)
+dat     <- read.csv("data/../../complete-data.csv", row.names = 1)
 
 # data must be numeric for eda
 dat_eda <- dat[,-106]
@@ -85,19 +85,16 @@ ggthemr_reset()
 # CLUSTERING
 # =====================================================================================
 set.seed(2)
-cali <- grep("University of California-", dat$INSTNM)
-dat_cali <- dat_eda[cali,]
-random_sample_smaller <- sample(1:nrow(dat), 10, replace = FALSE)
+
+random_sample_smaller <- sample(1:nrow(dat_eda), 15, replace = FALSE)
 dat_for_hclust <- dat_eda[random_sample_smaller,]
 rownames(dat_for_hclust) <- dat$INSTNM[random_sample_smaller]
 
-rownames(dat_cali) <- as.character(dat$INSTNM[cali])
-d <- dist(dat_cali)
+d <- dist(dat_for_hclust)
 hc <- hclust(d)
 
-
 # MDS
-autoplot(cmdscale(d, eig = TRUE), shape=FALSE, label.size = 2.6, col='tomato')
+autoplot(cmdscale(d, eig = TRUE), shape=FALSE, label.size = 3, col='tomato')
 
 # PHYLOGENIX TREE
 mypal = c("#fdae61","#a6d96a","#1a9641")
@@ -196,14 +193,6 @@ print(g)
 
 # these classes look like they can be easily classified, so we'll opt for a classification method
 
-
-
-
-
-
-
-
-
 # =====================================================================================
 # Correlation Plot
 # =====================================================================================
@@ -215,3 +204,35 @@ corrplot.mixed(cor(dat_eda[,sample(108,15, replace=F)]), upper="color",
 # correlation easy.
 # We'll go with the latter and choose xgboost
 
+# =====================================================================================
+# UNIVERSITY OF CALIFORNIA STUFF
+# =====================================================================================
+
+set.seed(2)
+cali <- grep("University of California-", dat$INSTNM)
+dat_cali <- dat_eda[cali,]
+rownames(dat_cali) <- as.character(dat$INSTNM[cali])
+d <- dist(dat_cali)
+hc <- hclust(d)
+# MDS
+autoplot(cmdscale(d, eig = TRUE), shape=FALSE, label.size = 2.6, col='tomato')
+# PHYLOGENIX TREE
+mypal = c("#fdae61","#a6d96a","#1a9641")
+clus5 = cutree(hc, 3)
+op = par(bg = "#ffffbf")
+plot(as.phylo(hc), type = "fan", tip.color = mypal[clus5], label.offset = 1, 
+     cex = 1, col = "red")
+plot(as.phylo(hc), type = "unrooted")
+# HIERARCHICAL CLUSTERING
+plot(hc, cex = 0.7)
+
+# =====================================================================================
+# INVESTIGATE THE QUALITY INDEX RANKING (NOT INCLUDED IN FINAL FILE)
+# =====================================================================================
+
+dat2 <- dat %>% select(QUALITY_INDEX, INSTNM) %>%
+  arrange(QUALITY_INDEX)
+
+head(dat2, 20)
+
+tail(dat2, 20)
