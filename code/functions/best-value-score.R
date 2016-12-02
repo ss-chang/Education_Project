@@ -36,21 +36,21 @@ source("../scripts/initial-eda.R")
 # Write a function to calculate best value
 # =====================================================================================
 
-best_value_score <- function(college){
-  quality <- 
+best_value_score <- function(college, dataset){
+  quality <- as.numeric(subset(dataset, INSTNM == college, QUALITY))
   
-  if (as.numeric(subset(dat2, INSTNM == college, CONTROL)) == 1){
-    discounted_total_cost <- as.numeric(subset(dat, INSTNM == college, NPT4_PUB))
+  if (as.numeric(subset(dataset, INSTNM == college, CONTROL)) == 1){
+    discounted_total_cost <- as.numeric(subset(dataset, INSTNM == college, NPT4_PUB))
   } else {
-    discounted_total_cost <- as.numeric(subset(dat, INSTNM == college, NPT4_PRIV))
+    discounted_total_cost <- as.numeric(subset(dataset, INSTNM == college, NPT4_PRIV))
   }
   
-  need_based_aid <- as.numeric(subset(dat, INSTNM == college, PCTPELL))
+  need_based_aid <- as.numeric(subset(dataset, INSTNM == college, PCTPELL))
   
-  if (is.null(subset(dat2, INSTNM == college, COSTT4_A)[1, ])){
-    sticker_price <- as.numeric(subset(dat, INSTNM == college, COSTT4_P))
+  if (is.null(subset(dataset, INSTNM == college, COSTT4_A)[1, ])){
+    sticker_price <- as.numeric(subset(datset, INSTNM == college, COSTT4_P))
   } else {
-    sticker_price <- as.numeric(subset(dat, INSTNM == college, COSTT4_A))
+    sticker_price <- as.numeric(subset(datset, INSTNM == college, COSTT4_A))
   }
   
   average_discount <- need_based_aid/sticker_price
