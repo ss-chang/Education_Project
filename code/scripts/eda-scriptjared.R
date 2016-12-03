@@ -93,6 +93,7 @@ rownames(dat_for_hclust) <- dat$INSTNM[random_sample_smaller]
 d <- dist(dat_for_hclust)
 hc <- hclust(d)
 
+
 # MDS
 autoplot(cmdscale(d, eig = TRUE), shape=FALSE, label.size = 3, col='tomato')
 
