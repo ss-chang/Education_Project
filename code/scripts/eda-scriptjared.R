@@ -23,17 +23,16 @@ library(cluster)
 library(caret)
 library(ggthemr)
 library(ape)
+library(ggdendro)
 
 # =====================================================================================
 # loading data
 # =====================================================================================
 
-# select file to load
-#setwd("~/Desktop/Education_Project/")
 
-# read in your file, call it "dat"
-dat     <- read.csv("data/../../complete-data.csv", row.names = 1)
+source("calculate-best-value.R")
 
+dat <- dat_3
 # data must be numeric for eda
 dat_eda <- dat[,-106]
 dat_eda <- apply(dat_eda, 2, function(x) as.numeric(x))
@@ -50,10 +49,10 @@ hist(dat_eda$QUALITY_INDEX)
 
 # Histogram
 ggthemr('dust')
-ggplot(dat_eda, aes(QUALITY_INDEX)) +
+ggplot(dat_eda, aes(BV_SCORE)) +
   geom_histogram(aes(y=..density..), binwidth = .018) +
   geom_density() +
-  ggtitle("Histogram of QUALITY_INDEX")
+  ggtitle("Histogram of Best Value")
 
 # Histogram
 ggthemr('dust')
@@ -63,15 +62,15 @@ ggplot(dat_eda, aes(ABOVE_MEDIAN_MINORITIES)) +
 
 
 # Boxplots by Region
-ggplot(dat_eda, aes(as.factor(ABOVE_MEDIAN_MINORITIES),QUALITY_INDEX)) +
+ggplot(dat_eda, aes(as.factor(ABOVE_MEDIAN_MINORITIES),BV_SCORE)) +
   geom_boxplot() + 
   facet_wrap(~ REGION) +
-  labs(title="Boxplots of Quality by Minority Count per Region", x="Above Median Minority",
-       ylab = "Quality_Index")
+  labs(title="Boxplots of School Value by Minority Count per Region", x="Above Median Minority",
+       ylab = "BV_SCORE")
 
 
 dat_eda <- dat_eda %>%
-  mutate(quantile = ntile(QUALITY_INDEX, 4))
+  mutate(quantile = ntile(BV_SCORE, 4))
 # Boxplots by Region
 ggplot(dat_eda, aes(as.factor(as.numeric(quantile)), MINORITIES)) +
   geom_boxplot() + 
@@ -96,19 +95,13 @@ hc <- hclust(d)
 # MDS
 autoplot(cmdscale(d, eig = TRUE), shape=FALSE, label.size = 3, col='tomato')
 
-# PHYLOGENIX TREE
-mypal = c("#fdae61","#a6d96a","#1a9641")
-# cutting dendrogram in 5 clusters
-clus5 = cutree(hc, 3)
-# plot
-op = par(bg = "#ffffbf")
-# Size reflects miles per gallon
-plot(as.phylo(hc), type = "fan", tip.color = mypal[clus5], label.offset = 1, 
-     cex = 1, col = "red")
+
+# Phylo Tree
+plot(as.phylo(hc), type = "fan")
 plot(as.phylo(hc), type = "unrooted")
 # HIERARCHICAL CLUSTERING
 plot(hc, cex = 0.7)
-
+ggdendrogram(hc, rotate=T) + theme_solarized()
 
 # =====================================================================================
 # PCA
@@ -124,10 +117,10 @@ pca <- prcomp(dat_eda[,cols_to_keep], scale = T)
 plot(pca, main="Scree Plot")
 
 # PCA for QUALITY_INDEX
-autoplot(pca, data=dat_eda, colour = "QUALITY_INDEX", alpha=.95, size=3) + 
+autoplot(pca, data=dat_eda, colour = "BV_SCORE", alpha=.95, size=3) + 
   ggtitle("PCA of QUALITY_INDEX") +
   theme_wsj() +
-  scale_colour_gradient(limits=c(0, 1), low="yellow2", high="red", space="Lab")
+  scale_colour_gradient(limits=c(.04, .37), low="yellow2", high="red", space="Lab")
 
 # PCA for ABOVE_MEDIAN_MINORITIES
 autoplot(pca, data=dat_eda, colour = "ABOVE_MEDIAN_MINORITIES", alpha=.6, size=3, pch=4) + 
@@ -157,7 +150,7 @@ tsne = Rtsne(as.matrix(dat_eda), check_duplicates=FALSE, pca=TRUE,
              perplexity=30, theta=0.3, dims=2)
 
 embedding = as.data.frame(tsne$Y)
-embedding$Class = dat_eda$QUALITY_INDEX
+embedding$Class = dat_eda$BV_SCORE
 g = ggplot(embedding, aes(x=V1, y=V2, color=Class)) +
   theme(plot.title = element_text(lineheight=2, face="bold"))+
   geom_point(size=2, alpha=1, shape=19) +
@@ -168,7 +161,7 @@ g = ggplot(embedding, aes(x=V1, y=V2, color=Class)) +
   theme(axis.text.x=element_blank(),
         axis.text.y=element_blank()) + 
   theme_solarized() +
-  scale_colour_gradient(limits=c(0, 1), low="yellow", high="red", space="Lab")
+  scale_colour_gradient(limits=c(.04, .37), low="yellow", high="red", space="Lab")
 print(g)
 
 
@@ -196,7 +189,7 @@ print(g)
 # =====================================================================================
 # Correlation Plot
 # =====================================================================================
-set.seed(54)
+set.seed(56)
 corrplot.mixed(cor(dat_eda[,sample(108,15, replace=F)]), upper="color", 
                tl.pos="lt", diag="n", order="hclust", hclust.method="complete")
 
@@ -204,35 +197,3 @@ corrplot.mixed(cor(dat_eda[,sample(108,15, replace=F)]), upper="color",
 # correlation easy.
 # We'll go with the latter and choose xgboost
 
-# =====================================================================================
-# UNIVERSITY OF CALIFORNIA STUFF
-# =====================================================================================
-
-set.seed(2)
-cali <- grep("University of California-", dat$INSTNM)
-dat_cali <- dat_eda[cali,]
-rownames(dat_cali) <- as.character(dat$INSTNM[cali])
-d <- dist(dat_cali)
-hc <- hclust(d)
-# MDS
-autoplot(cmdscale(d, eig = TRUE), shape=FALSE, label.size = 2.6, col='tomato')
-# PHYLOGENIX TREE
-mypal = c("#fdae61","#a6d96a","#1a9641")
-clus5 = cutree(hc, 3)
-op = par(bg = "#ffffbf")
-plot(as.phylo(hc), type = "fan", tip.color = mypal[clus5], label.offset = 1, 
-     cex = 1, col = "red")
-plot(as.phylo(hc), type = "unrooted")
-# HIERARCHICAL CLUSTERING
-plot(hc, cex = 0.7)
-
-# =====================================================================================
-# INVESTIGATE THE QUALITY INDEX RANKING (NOT INCLUDED IN FINAL FILE)
-# =====================================================================================
-
-dat2 <- dat %>% select(QUALITY_INDEX, INSTNM) %>%
-  arrange(QUALITY_INDEX)
-
-head(dat2, 20)
-
-tail(dat2, 20)
