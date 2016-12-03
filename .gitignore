@@ -1,0 +1,9 @@
+# R residual files #
+
+*.Rhistory
+
+# Other crap that may show up # 
+
+*.tex
+*.log
+*.gz
