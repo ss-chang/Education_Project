@@ -12,9 +12,8 @@ library(caret)
 library(xgboost)
 
 
-sink("../../session-info.txt")
-'R version'
+sink("../../session-info.txt", append = TRUE)
 cat("Session Information")
 print(sessionInfo())
 devtools::session_info()
-sink(NULL)
+sink()
