@@ -1,6 +1,5 @@
 library(ggplot2)
 library(glmnet)
-library(tm)
 library(dplyr)
 library(XML)
 library(httr)
