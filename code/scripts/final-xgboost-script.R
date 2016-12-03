@@ -123,7 +123,7 @@ plot(cumsum(importance_matrix$Gain),type='l', col='tomato', lwd=6,
 abline(v=10, col='skyblue1',lwd=10) 
 
 top_ten <- importance_matrix$Feature[1:10]
-            
+save(top_ten,file= "top_ten.RData")
 
 
 
@@ -236,3 +236,11 @@ importance_matrix = xgb.importance(names, model=bst)
 # plot feature importance
 gp = xgb.plot.importance(importance_matrix)
 print(gp) 
+
+
+
+# Dave data
+save(bst, file = "xgb_model.RData")
+
+
+
