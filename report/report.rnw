@@ -15,98 +15,83 @@ Absstract goes here.
 
 \section{Introduction}
 
-Our Question: A minority-focused NGO wants to donate money to schools in an effort to help increase minority success. In order to do this, they need to identify those schools that "underserve" minority students. As they may have multiple schools in consideration, they'd also like a way to determine which of the underserving schools deserves funding.
-  
-  This is where we come in. We do the following:
-      a) Determine which universities "underserve" minorities (XGBOOST)
-      b) Using a created BESTVALUE metric, rank universities based on how "good" they are.
-      
-  Thus, the NGO can employ us in the following 2 ways:
-         1. Given a school, predict whether or not it will underserve or overserves minorities (XGBOOST)
-         2. Given multiple minority-serving schools, determine which should give funding (BEST VALUE METRIC)
-         
-         Summary of our value: Given a list of schools, determine which schools underserve minorities. From these schools, rank them based on value.
+Our Question: A minority-focused NGO wants to donate money to schools in an effort to help increase minority success. In order to do this, they need to identify those schools that "underserve" minority students. As they may have multiple schools in consideration, they'd also like a way to determine which of the underserving schools deserves funding.This is where we come in. We do the following:
+
+\begin{itemize}
+      \item Determine which universities "underserve" minorities (XGBOOST)
+      \item Using a created BESTVALUE metric, rank universities based on how "good" they are.
+\end{itemize}
+\bigbreak
+
+Thus, the NGO can employ us in the following 2 ways:
+
+\begin{enumerate}
+\item Given a school, predict whether or not it will underserve or overserves minorities (XGBOOST). 
+\item Given multiple minority serving schools, determine which should give funding (BEST VALUE METRIC).
+\end{enumerate}
+
+
+
+Summary of our value: Given a list of schools, determine which schools underserve minorities. From these schools, rank them based on value.
 
 \section{Analysis}
 
 Our analysis consists of two primary objectives:
-  1. Define model used to predict minority serving (XG-BOOST)
-  2. Define metric used to rank schools (BEST VALUE RANKING)
+\begin{enumerate}
+  \item Define model used to predict minority serving (XG-BOOST)
+  \item Define metric used to rank schools (BEST VALUE RANKING)
+\end{enumerate}  
 
-- Train XG-Boost model
-    - Describe process (split into train/test, one-hot encoding, make numeric, etc.)
-    - Return Model Accuracy
-    
-- Ranking schools
-    - Describe BEST VALUE metric. We used lasso/xgboost feature importance to find the variables that US NEWS uses, then made a metric similar to theirs. After this, we ranked out data.
+\textbf{Train XG-Boost model}
+Describe process (split into train/test, one-hot encoding, make numeric, etc.)
+Return Model Accuracy
+
+\medbreak
+
+\textbf{Ranking schools}
+Describe BEST VALUE metric. We used lasso/xgboost feature importance to find the variables that US NEWS uses, then made a metric similar to theirs. After this, we ranked out data.
          
 
 
 \subsection{Data}
 
-Because of fluctuations in data and the low volatility in year-to-year things (red-tape etc.), we opted to use the most recent dataset. In this way, we don't lose much information. Furthermore, by utilizing only the most recent data, we have the most up-to-date data.
+Because of fluctuations in data and the low volatility in year-to-year things (red-tape etc.), we opted to use the most recent dataset. In this way, we have access to more useful variables and also have a data set that is more likely to reflect present day. 
+\medbreak
+We want to identify those schools that overserve or underserve minorities. Our dataset lives in very high dimensions, so our first order of business is to reduce the dimensionality. This is important because the NGO would like to understand our methods, so our model must be interpretable. We broke this up into 4 steps:
 
-We want to identify those schools that over or underserve minorities. Our dataset lives in very high dimensions, so our first order of business is to reduce the dimensionality. This is important because the NGO would like to understand our methods, so our model must be interpretable. We broke this up into 4 steps:
+\begin{enumerate}
+  \item Hand-select important features from data. This yielded about 500 variables.
+  \item Create our own variables, including BEST VALUE metric
+  \item From these variables, we needed to select variables that were related to minorities. We determined these variables with FEATURE IMPORTANCE (LASSO/XGBOOST).
+  \item Remove correlated variables
+\end{enumerate}
 
-  1. Hand-select important features from data. This yielded about 500 variables.
-  2. Create our own variables, including BEST VALUE metric
-  3. From these variables, we needed to select variables that were related to minorities. We determined               these variables with FEATURE IMPORTANCE (LASSO/XGBOOST)
-  4. Remove correlated variables
-        
-Step 1 of the above is self-explanatory.
+Step 1 of the above is self-explanatory and we selected the following variables (column names):
+\medbreak
+\textbf{Variable names:}
 
-Variable names: 
+\medbreak
+Step 2 of the above is more involved. To create BEST VALUE, we first scraped the wh\_post (Washignton Post best school rankings)
+for rankings. Once we had our ranked schools and appended them to our dataset, we used \linebreak LASSO/XGBOOST to pick those features that 
+were associated with a school being ranked (we treat this as a proxy for quality). We then used these variables to build a BEST-VALUE metric.
 
-  [1]"X"                      "INSTNM"                 "CITY"                   "STABBR"                
-  [5] "ZIP"                    "PREDDEG"                "CONTROL"                "REGION"                
-  [9] "LOCALE"                 "CCBASIC"                "CCUGPROF"               "CCSIZSET"              
- [13] "HBCU"                   "PBI"                    "ANNHI"                  "TRIBAL"                
- [17] "AANAPII"                "HSI"                    "NANTI"                  "RELAFFIL"              
- [21] "UGDS"                   "UGDS_WHITE"             "UGDS_BLACK"             "UGDS_HISP"             
- [25] "UGDS_ASIAN"             "UGDS_AIAN"              "UGDS_NHPI"              "UGDS_2MOR"             
- [29] "UGDS_NRA"               "UGDS_UNKN"              "PPTUG_EF"               "NPT4_PRIV"             
- [33] "NUM4_PRIV"              "TUITIONFEE_IN"          "INEXPFTE"               "AVGFACSAL"             
- [37] "PCTPELL"                "PCTFLOAN"               "RPY_3YR_RT"             "COMPL_RPY_3YR_RT"      
- [41] "LO_INC_RPY_3YR_RT"      "MD_INC_RPY_3YR_RT"      "HI_INC_RPY_3YR_RT"      "DEP_RPY_3YR_RT"        
- [45] "IND_RPY_3YR_RT"         "PELL_RPY_3YR_RT"        "NOPELL_RPY_3YR_RT"      "FEMALE_RPY_3YR_RT"     
- [49] "MALE_RPY_3YR_RT"        "FIRSTGEN_RPY_3YR_RT"    "NOTFIRSTGEN_RPY_3YR_RT" "RPY_5YR_RT"            
- [53] "COMPL_RPY_5YR_RT"       "LO_INC_RPY_5YR_RT"      "DEP_RPY_5YR_RT"         "IND_RPY_5YR_RT"        
- [57] "PELL_RPY_5YR_RT"        "NOPELL_RPY_5YR_RT"      "FEMALE_RPY_5YR_RT"      "MALE_RPY_5YR_RT"       
- [61] "FIRSTGEN_RPY_5YR_RT"    "NOTFIRSTGEN_RPY_5YR_RT" "RPY_7YR_RT"             "COMPL_RPY_7YR_RT"      
- [65] "LO_INC_RPY_7YR_RT"      "DEP_RPY_7YR_RT"         "IND_RPY_7YR_RT"         "PELL_RPY_7YR_RT"       
- [69] "NOPELL_RPY_7YR_RT"      "FEMALE_RPY_7YR_RT"      "MALE_RPY_7YR_RT"        "FIRSTGEN_RPY_7YR_RT"   
- [73] "NOTFIRSTGEN_RPY_7YR_RT" "INC_PCT_LO"             "DEP_STAT_PCT_IND"       "DEP_INC_PCT_LO"        
- [77] "IND_INC_PCT_LO"         "PAR_ED_PCT_1STGEN"      "INC_PCT_M1"             "INC_PCT_M2"            
- [81] "INC_PCT_H1"             "INC_PCT_H2"             "DEP_INC_PCT_M1"         "IND_INC_PCT_M1"        
- [85] "PAR_ED_PCT_HS"          "PAR_ED_PCT_PS"          "DEBT_MDN"               "GRAD_DEBT_MDN"         
- [89] "WDRAW_DEBT_MDN"         "LO_INC_DEBT_MDN"        "MD_INC_DEBT_MDN"        "HI_INC_DEBT_MDN"       
- [93] "DEP_DEBT_MDN"           "IND_DEBT_MDN"           "PELL_DEBT_MDN"          "NOPELL_DEBT_MDN"       
- [97] "FEMALE_DEBT_MDN"        "MALE_DEBT_MDN"          "FIRSTGEN_DEBT_MDN"      "NOTFIRSTGEN_DEBT_MDN"  
-[101] "GRAD_DEBT_MDN10YR"      "CUML_DEBT_N"            "CUML_DEBT_P90"          "CUML_DEBT_P75"         
-[105] "CUML_DEBT_P25"          "CUML_DEBT_P10"          "LOAN_EVER"              "PELL_EVER"             
-[109] "FEMALE"                 "MARRIED"                "DEPENDENT"              "FIRST_GEN"             
-[113] "FAMINC"                 "MD_FAMINC"              "FAMINC_IND"             "GRAD_DEBT_MDN_SUPP"    
-[117] "GRAD_DEBT_MDN10YR_SUPP" "ICLEVEL"                "UGDS_MEN"               "UGDS_WOMEN"            
-[121] "RANKED"                
+insert feature importance
 
 
-Step 2 of the above is more involved. To create BEST VALUE, we first scraped the wh_post for rankings. Once we had our ranked schools and appended them to our dataset, we used LASSO/XGBOOST to pick those features that were associated with a school being ranked (we treat this as a proxy for quality). We then used these variables to build a BEST-VALUE metric.
-
-- insert feature importance
-
-
-
+\medbreak
 For step 3, we computed another feature importance metric, this time with our response being the minority served classification. We get rid of variables that don't contribute to our model. Because we are predicting discrete categories of minority serving, we use xgboost for feature importance.
 
-- insert feature importance 2 plot
+insert feature importance 2 plot
 
+\medbreak
 Step 4 is to check for correlated variables and to remove them as well.
 
 insert correlation plot
 
-Finally, we have our dataset. Now, our dataset is much smaller AND more relevant to our goals. Thus, our data is less computationally expensive, has higher predictable power, AND is more interpretable.
+\medbreak
+Finally, we have our dataset. Now our dataset is much smaller \textbf{and} more relevant to our goals. Thus, our data is less computationally expensive, has higher predictable power, and is more interpretable.
         
-- discuss new data
+discuss new data
 
 \subsection{Exploratory Data Analysis}
 
