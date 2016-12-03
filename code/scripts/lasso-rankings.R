@@ -21,6 +21,7 @@ dat <- read.csv("../../data/2014-15-clean-data.csv",
                 row.names=1, 
                 stringsAsFactors = FALSE)
 dat <- dat[dat$ICLEVEL==1,]
+dat <- dat[dat$RELAFFIL==-2,]
 
 colnames(dat)
 
