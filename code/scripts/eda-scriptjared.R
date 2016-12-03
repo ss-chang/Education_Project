@@ -85,6 +85,7 @@ ggthemr_reset()
 # =====================================================================================
 set.seed(2)
 
+# Make random sample so data clusters are visible
 random_sample_smaller <- sample(1:nrow(dat_eda), 15, replace = FALSE)
 dat_for_hclust <- dat_eda[random_sample_smaller,]
 rownames(dat_for_hclust) <- dat$INSTNM[random_sample_smaller]
@@ -94,7 +95,6 @@ hc <- hclust(d)
 
 # MDS
 autoplot(cmdscale(d, eig = TRUE), shape=FALSE, label.size = 3, col='tomato')
-
 
 # Phylo Tree
 plot(as.phylo(hc), type = "fan")
