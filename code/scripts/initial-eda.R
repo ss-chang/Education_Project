@@ -75,8 +75,13 @@ dat_for_pca <- dat_for_pca[,-which(colnames(dat_for_pca) =="ICLEVEL")]
 # =====================================================================================
 pca <- princomp(dat_for_pca)
 screeplot(pca, type = "l")
-my_colors <- c("tomato1", "tomato4")
+dev.copy(png, "../../images/pca/screeplot.png")
+dev.off()
+dev.copy(pdf, "../../images/pca/screeplot.pdf")
+dev.off()
 
+
+my_colors <- c("tomato1", "tomato4")
 plot(pca$scores, main = "PCA View of Universities",
      pch = 16,
      col = my_colors[(dat$RANKED+1)])
@@ -87,6 +92,10 @@ legend("topright",
        legend = c("Non-Ranked", "Ranked"),
        title = "RANKED",
        fill = my_colors)
+dev.copy(png, "../../images/pca/universities-all.png")
+dev.off()
+dev.copy(pdf, "../../images/pca/universities-all.pdf")
+dev.off()
 
 set.seed(16)
 random_sample <- sample(1:nrow(dat_for_pca), 
@@ -99,7 +108,10 @@ text(smaller_pca$scores[,1],
      smaller_pca$scores[,2],
      dat[random_sample,]$INSTNM,
      cex=0.5)
-
+dev.copy(png, "../../images/pca/universities-smaller.png")
+dev.off()
+dev.copy(pdf, "../../images/pca/universities-smaller.pdf")
+dev.off()
 
 
 plot(pca$loadings, main  = "PCA View of Predictors", col = "white")
@@ -107,6 +119,10 @@ text(pca$loadings[,1],
      pca$loadings[,2],
      colnames(dat_for_pca),
      cex = 0.6)
+dev.copy(png, "../../images/pca/predictors.png")
+dev.off()
+dev.copy(pdf, "../../images/pca/predictors.pdf")
+dev.off()
 
 random_sample_smaller <- sample(1:nrow(dat), 50, replace = FALSE)
 dat_for_hclust <- dat_for_pca[random_sample_smaller,]
@@ -116,6 +132,10 @@ d <- dist(dat_for_hclust)
 hc <- hclust(d)
 
 plot(hc, cex = 0.7)
+dev.copy(png, "../../images/pca/sample-hclust.png")
+dev.off()
+dev.copy(pdf, "../../images/pca/sample-hclust.pdf")
+dev.off()
 
 # =====================================================================================
 # Make dat_for_lasso
