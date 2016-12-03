@@ -22,6 +22,7 @@ dat <- read.csv("../../data/2014-15-clean-data.csv",
                 stringsAsFactors = FALSE)
 dat <- dat[dat$ICLEVEL==1,]
 dat <- dat[dat$RELAFFIL==-2,]
+dat <- dat[!grepl("seminary", dat$INSTNM, ignore.case = TRUE), ]
 
 colnames(dat)
 
