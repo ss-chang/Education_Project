@@ -1,16 +1,20 @@
 \documentclass{article}
-
 \title{Education Project}
 \author{Jared Wilber, Shannon Chang, Noura Kawa, Manuel Horta}
-\date{\today}
+\date{December 5, 2016}
 
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+\graphicspath{ {../images/eda/} {../images/pca/} {../images/xgboost/}}
 
 \begin{document}
+\maketitle
 \SweaveOpts{concordance=TRUE}
 
 
 \begin{abstract}
-Absstract goes here. 
+
+Our client is a non-profit NGO with an interest in minority success. They want to donate money to schools that serve minorities well. We provide a method of choosing schools which are most likely to help minority students succeed by using the "collegescorecard" data and analysis of variables that are most significant for minorities.  
 \end{abstract}
 
 \section{Introduction}
@@ -56,6 +60,7 @@ Describe BEST VALUE metric. We used lasso/xgboost feature importance to find the
 \subsection{Data}
 
 Because of fluctuations in data and the low volatility in year-to-year things (red-tape etc.), we opted to use the most recent dataset. In this way, we have access to more useful variables and also have a data set that is more likely to reflect present day. 
+
 \medbreak
 We want to identify those schools that overserve or underserve minorities. Our dataset lives in very high dimensions, so our first order of business is to reduce the dimensionality. This is important because the NGO would like to understand our methods, so our model must be interpretable. We broke this up into 4 steps:
 
@@ -69,6 +74,8 @@ We want to identify those schools that overserve or underserve minorities. Our d
 Step 1 of the above is self-explanatory and we selected the following variables (column names):
 \medbreak
 \textbf{Variable names:}
+
+
 
 \medbreak
 Step 2 of the above is more involved. To create BEST VALUE, we first scraped the wh\_post (Washignton Post best school rankings)
@@ -86,10 +93,13 @@ insert feature importance 2 plot
 \medbreak
 Step 4 is to check for correlated variables and to remove them as well.
 
-insert correlation plot
+\begin{figure}[h]
+\includegraphics [width = 75mm]{corrplot-eda}
+\caption{\textbf {This plot shows the correlation matrix between 5 random variables from the reduced data set.}}
+\end{figure}
 
 \medbreak
-Finally, we have our dataset. Now our dataset is much smaller \textbf{and} more relevant to our goals. Thus, our data is less computationally expensive, has higher predictable power, and is more interpretable.
+Finally, we have our dataset. Now our dataset is much smaller \textbf{and} more relevant to our goals. Thus, our data is less computationally expensive, has higher prediction power, and is more interpretable.
         
 discuss new data
 
@@ -99,12 +109,85 @@ discuss new data
 ------ EDA------
         
   Plot ideas: What they reveal
-      - PCA
-      - T-sne
-      - FEATURE PLOT
-      
----- end eda ----
+    
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{hist-quality-index}
+\caption{\textbf {Histogram of the Quality Index.}}
+\end{figure}
 
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{hist-best-value}
+\caption{\textbf {Histogram of best value.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{hist-above-median-minorities}
+\caption{\textbf {Histogram of ABOVE\_MEDIAN\_MINORITIES.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{boxplots-school-value-minority-Count-per-region}
+\caption{\textbf {Boxplots of School Value by Minority Count per Region.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{boxplots-minority-percentage-by-value-quartiles}
+\caption{\textbf {Boxplots of Minority Percentage by Value Quartiles.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{autoplot}
+\caption{\textbf {IDK WHAT THIS IS.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{phylo-fan}
+\caption{\textbf {Phylo Tree.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{phylo-unrooted}
+\caption{\textbf {Phylo Tree.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{ggdendrogram}
+\caption{\textbf {HIERARCHICAL CLUSTERING.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{scree-plot}
+\caption{\textbf {Scree plot.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{pca-quality}
+\caption{\textbf {PCA of QUALITY\_INDEX}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{pca-enrollment-rate-minority}
+\caption{\textbf {PCA of Minority Enrollment Rate}}
+\end{figure}
+
+
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{feature-plot}
+\caption{\textbf {IDK WAT TO WRITE HERE}}
+\end{figure}
+
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{tsne-quality-index}
+\caption{\textbf {t-SNE 2D Embedding of School Quality.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{tsne-above-median-minorities}
+\caption{\textbf {t-SNE 2D Embedding of Minority Count.}}
+\end{figure}
 
 \section{Results}
 
