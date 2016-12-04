@@ -10,7 +10,7 @@ library(xgboost)
 # Load and prepare data
 # =====================================================================================
 
-source("code/scripts/calculate-best-value.R")
+source("calculate-best-value.R")
 #dat_3 <- read.csv("data/complete-data.csv")
 df2 <- dat_3
 df2$MINORITIES <- NULL     # This is essentially our response = overfit
@@ -108,6 +108,10 @@ importance_matrix = xgb.importance(names, model=bst)
 # plot feature importance
 gp = xgb.plot.importance(importance_matrix)
 print(gp) 
+dev.copy(png, "../../images/xgboost/feature-importance.png")
+dev.off()
+dev.copy(pdf, "../../images/xgboost/feature-importance.pdf")
+dev.off()
 
 # =====================================================================================
 # XGBOOST: Select best features
@@ -118,11 +122,19 @@ plot(importance_matrix$Gain,type='l', col='tomato', lwd=6,
      xlim=c(0,25), main="How Many Featurs to Select?", xlab="Number of Features",
      ylab="Gain from Features")
 abline(v=10, col='skyblue1',lwd=10)
+dev.copy(png, "../../images/xgboost/best-features.png")
+dev.off()
+dev.copy(pdf, "../../images/xgboost/best-features.pdf")
+dev.off()
 
 plot(cumsum(importance_matrix$Gain),type='l', col='tomato', lwd=6, 
      xlim=c(0,40), main="How Many Featurs to Select?", xlab="Number of Features",
      ylab="Gain from Features")
 abline(v=10, col='skyblue1',lwd=10) 
+dev.copy(png, "../../images/xgboost/best-features-cumsum.png")
+dev.off()
+dev.copy(pdf, "../../images/xgboost/best-features-cumsum.pdf")
+dev.off()
 
 top_ten <- importance_matrix$Feature[1:10]
 save(top_ten,file= "top_ten.RData")
@@ -237,7 +249,11 @@ names = dimnames(train.matrix)[[2]]
 importance_matrix = xgb.importance(names, model=bst)
 # plot feature importance
 gp = xgb.plot.importance(importance_matrix)
-print(gp) 
+print(gp)
+dev.copy(png, "../../images/xgboost/optimized-feature-importance.png")
+dev.off()
+dev.copy(pdf, "../../images/xgboost/optimized-feature-importance.pdf")
+dev.off()
 
 
 
