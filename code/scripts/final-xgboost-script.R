@@ -10,20 +10,22 @@ library(xgboost)
 # Load and prepare data
 # =====================================================================================
 
-dat     <- read.csv("data/complete-data.csv", row.names = 1)
-df2 <- dat
+source("code/scripts/calculate-best-value.R")
+#dat_3 <- read.csv("data/complete-data.csv")
+df2 <- dat_3
 df2$MINORITIES <- NULL     # This is essentially our response = overfit
 df2$MINORITIES.1 <- NULL   # This is essentially our response = overfit
 df2$INSTNM <- NULL         # Don't need
 # Make data numeric
 df2 <- as.data.frame(apply(df2, 2, as.numeric))
 
+
 # =====================================================================================
 # Define test and training sets
 # =====================================================================================
 set.seed(1)
 # Define datasets
-train_ind <- sample(3281, 2500)
+train_ind <- sample(2166, 1500)
 train <- df2[train_ind,]
 test <- df2[-train_ind,]
 # Get response labels
@@ -155,7 +157,7 @@ df2$INSTNM <- NULL         # Don't need
 df2 <- as.data.frame(apply(df2, 2, as.numeric))
 set.seed(2)
 # Define datasets
-train_ind <- sample(3281, 2500)
+train_ind <- sample(2166, 1500)
 train <- df2[train_ind,c(top_ten,"ABOVE_MEDIAN_MINORITIES")]
 test <- df2[-train_ind,c(top_ten,"ABOVE_MEDIAN_MINORITIES")]
 # Get response labels
@@ -239,7 +241,7 @@ print(gp)
 
 
 
-# Dave data
+# Dave dataa
 save(bst, file = "xgb_model.RData")
 
 
