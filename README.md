@@ -78,14 +78,14 @@ Education_Project/
 		+ feature-plot.png  
 		+ pca-enrollment-rate-minority.pdf  
 		+ pca-enrollment-rate-minority.png  
-		+ pca-quality.pdf  
-		+ pca-quality.png  
+		+ pca-best-value.pdf  
+		+ pca-best-value.png  
 		+ scree-plot.pdf  
 		+ scree-plot.png  
 		+ tsne-above-median-minorities.pdf  
 		+ tsne-above-median-minorities.png  
-		+ tsne-quality-index.pdf  
-		+ tsne-quality-index.png  
+		+ tsne-best-value.pdf  
+		+ tsne-best-value.png  
 	+ xgboost/  
 		+ best-features.pdf  
 		+ best-features.png  
@@ -107,14 +107,16 @@ Education_Project/
 * Shannon Chang
 * Manuel Horta
 
-## Installation
+## Installation  
 
-[to do]
+* Use a computer with R and bash installed  
+* Clone this repository into your directory of choice  
 
 
-## Usage
+## Usage  
 
-[to do]
+* Check the session-info.txt file to make sure you have the relevant packages  
+* Run the Makefile as you see fit to re-implement what you want  
 
 ## Make commands  
 
