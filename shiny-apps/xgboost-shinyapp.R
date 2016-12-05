@@ -191,7 +191,7 @@ server <- function(input, output, session) {
                               include.rownames = FALSE)
   
   output$sol <- renderText(
-    if(PredValue() >= 0.5){"A school with this profile serves minorities"}
+    if(mean(PredValue()) >= 0.5){"A school with this profile serves minorities"}
     else {"A school with this profile underserves Minorities"})
   
   output$schools <- renderTable(
