@@ -13,7 +13,7 @@ Description: Find schools from Washington Post school rankings data that we were
 able to match with our dataset and rename schools that do exist in our 
 main dataset, but were not matched because of slight differences in name
 re-name schools where data was confused
-this is the first script to be run
+this is the first script to be run.
 
 **data-preprocessing.R**
      
@@ -22,25 +22,23 @@ Description: Selecting columns for use.
     
 **pca-script.R**
      
-Description: 
+Description: PCA analysis.
      
      
 **lasso-rankings.R**
  
-Description:
+Description: Lasso for variable selection.
      
 **eda-scriptjared**
-Description:
+Description: Exploratory data analysis.
 
 **final-xgboost-script**
-Description:
+Description: Feature importance code. 
 
-**initial-eda**
-Description: 
+**calculate-best-value.R**
      
      
 **session-info.R**
-Description:
       
  
      
