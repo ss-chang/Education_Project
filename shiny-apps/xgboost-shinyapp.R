@@ -27,12 +27,6 @@ df2$INSTNM <- NULL         # Don't need
 # Make data numeric
 df2 <- as.data.frame(apply(df2, 2, as.numeric))
 
-# The below code will be replace with the widget input information for each column in 
-# top ten
-
-# check for NA
-# print(paste("No NA values in df2:", sum(is.na(df2)) == 0))
-
 set.seed(1)
 sample_rows <- sample(nrow(df2),floor(0.7*nrow(df2)), replace = FALSE)
 test2 <- df2[sample_rows,c(top_ten,"ABOVE_MEDIAN_MINORITIES")]
@@ -40,10 +34,6 @@ test_labels <- test2$ABOVE_MEDIAN_MINORITIES
 test2 <- test2[-grep('ABOVE_MEDIAN_MINORITIES', colnames(test2))]
 test.matrix <- as.matrix(test2)
 
-# check for NA
-#print(paste("No NA values in test2:", sum(is.na(test2)) == 0))
-
-# select number of classes for xgboost model
 num.class <- 2
 
 # =======================================================================================
@@ -54,31 +44,20 @@ app_df <- as.data.frame(test.matrix)
 # =======================================================================================
 # Function to Generate Predictions
 # =======================================================================================
-generate_preds <- function(input_values)
-{
-  max.col(t(matrix(predict(bst, input_values),
-                   nrow=num.class, 
-                   ncol=(length(predict(bst, input_values))/num.class)
-  )
-  ), "last") - 1
-}
-
 
 # =======================================================================================
 # Variable Names for Table Output
 # =======================================================================================
-table_names <- c("Region", 
-                 "Percent of Family Income in $75k-$110k",
-                 "Percent of Low-Income Dependent Students",
+table_names <- c("Percent of Family Income in $75k-$110k",
+                 "Percentage of Pell-Grant Recipients",
                  "Number of Undergraduates",
                  "Family Income",
-                 "Percentage of Pell-Grant Recipients",
-                 "Hispanic-Serving Institution",
                  "Average Faculty Salary",
-                 #"Married",
-                 #"Percentage of Federal Loan Recipients",
+                 "Hispanic-Serving Institution",
+                 "Region",
+                 "Percent of Low-Income Dependent Students",
                  "Average Cost, if Private University",
-                 "Carnegie Classification"
+                 "Location Type"
                  )
 
 # =======================================================================================
@@ -104,37 +83,87 @@ app_df$NEW_REGION <- factor(new_REGION)
 region_conversion_table <- data.frame("TEXT" = region_values, "NUMERIC" = 0:9)
 
 # =======================================================================================
+# Locale Conversion
+# =======================================================================================
+
+LOCALE_TEXT <- c(
+  "City: Large",# (population of 250,000 or more)"
+  "City: Midsize", #City: Midsize (population of at least 100,000 but less than 250,000)
+  "City: Small", #City: Small (population less than 100,000)
+  "Suburb: Small" ,#Suburb: Large (outside principal city, in urbanized area with population of 250,000 or more)
+  "Suburb: Midsize",#Suburb: Midsize (outside principal city, in urbanized area with population of at least 100,000 but less than 250,000)
+  "Suburb: Small",
+  "Town: Fringe",
+  "Town: Distant",
+  "Town: Remote",
+  "Rural: Fringe",
+  "Rural: Distant",
+  "Rural: Remote"
+)
+
+Locale_conversion <- data.frame("TEXT" = LOCALE_TEXT, "Value" = sort(unique(app_df$LOCALE), decreasing = F))
+#Locale_conversion$Value = as.vector(Locale_conversion$Value, mode = "numeric")
+new_LOCALE <- character(length(app_df$LOCALE))
+
+for(i in 1:nrow(app_df)){
+  new_LOCALE[i] <- as.character(Locale_conversion$TEXT[which(Locale_conversion$Value == app_df$LOCALE[i])])
+}
+app_df[,"LOCALE_TEXT"] <- factor(new_LOCALE)
+
+
+# =======================================================================================
 # server
 # =======================================================================================
 
 server <- function(input, output, session) {
   
+  
+  
   inputValues <- reactive({
     matrix(c(
+      
       input$INC_PCT_H1,
       input$PCTPELL,
       input$UGDS,
-      input$HSI,
-      (which(region_conversion_table$TEXT == input$new_REGION))-1,
-      input$AVGFACSAL,
-      input$DEP_INC_PCT_LO,
       input$FAMINC,
+      input$AVGFACSAL,
+      input$HSI,
+      input$DEP_INC_PCT_LO,
+      (which(region_conversion_table$TEXT == input$new_REGION))-1, #REGION
       input$NUM4_PRIV,
-      input$LOCALE
+      Locale_conversion$Value[which(Locale_conversion$TEXT == input$LOCALE_TEXT)] #Locale
       
     ),ncol=1)
   })
   
   PredValue <- reactive({
+    generate_preds <- function(input_values)
+    {
+      #predict(bst, input_values)
+      max.col(t(matrix(predict(bst, input_values),
+                       nrow=num.class, 
+                       ncol=(length(predict(bst, input_values))/num.class)
+      )
+      ), "last") - 1
+    }
     generate_preds(inputValues())
     })
   
   sliderValues <-   reactive({
     data.frame(
       "Names" = table_names,
-      "Values" = inputValues(),
-      "Minority-Serving Indicator" = as.logical(PredValue()))
-  })
+      "Selected Values" = c(input$INC_PCT_H1,
+                            input$PCTPELL,
+                            input$UGDS,
+                            input$FAMINC,
+                            input$AVGFACSAL,
+                            input$HSI,
+                            input$new_REGION,
+                            input$DEP_INC_PCT_LO,
+                            input$NUM4_PRIV,
+                            input$LOCALE_TEXT)
+    )
+    })
   
   dat2 <- dat[,c(top_ten,"INSTNM")]
   dat2$INSTNM <- as.character(dat2$INSTNM)
@@ -146,11 +175,13 @@ server <- function(input, output, session) {
   
   close_schools_output <- function(dist_dat)
   {
+    
     dist_dat <- apply(dist_dat, 2, as.numeric)
     rownames(dist_dat) <- c("test case", dat2$INSTNM)
-    d <- dist(dist_dat)
+    d <- dist(dist_dat, method = "manhattan")
     dMat <- as.matrix(d)
     tc <- head(order(dMat[-1,1]),10)+1
+    
     # The output is below
     ten_closest_schools <- rownames(dMat)[tc]
     return(matrix(ten_closest_schools, ncol = 1))
@@ -159,14 +190,19 @@ server <- function(input, output, session) {
   output$table <- renderTable(sliderValues(),
                               include.rownames = FALSE)
   
-  output$sol <- renderPrint(
-    if(mean(PredValue()) >= 0.5){"Servers Minorities"} else {"Underserves Minorities"})
+  output$sol <- renderText(
+    if(PredValue() >= 0.5){"A school with this profile serves minorities"}
+    else {"A school with this profile underserves Minorities"})
   
   output$schools <- renderTable(
     close_schools_output(closeSchools()),
     include.rownames = FALSE,
     include.colnames = FALSE
     )
+  
+  output$text <- renderText(
+    "A list of ten schools with a similar profile:"
+  )
   
 }
 
@@ -175,11 +211,20 @@ server <- function(input, output, session) {
 # =======================================================================================
 
 ui <- pageWithSidebar(
-  headerPanel('xgboost important predictors'),
+  
+  headerPanel('       Minority-Serving Schools Profile',
+              windowTitle = 'Minority-Serving Schools Profile'),
+  
   sidebarPanel(
     selectInput("new_REGION", "Region",
                 levels(app_df$NEW_REGION),
                 selected = "Far West"),
+    
+    
+    selectInput("LOCALE_TEXT", "Location Type",
+                levels(app_df$LOCALE_TEXT),
+                selected = "City: Small"),
+    
 
     sliderInput("INC_PCT_H1", "Percent of Family Income in $75k-$110k",
                 min = min(app_df$INC_PCT_H1), 
@@ -228,19 +273,16 @@ ui <- pageWithSidebar(
                 min = min(app_df[,top_ten[9]]), 
                 max = max(app_df[,top_ten[9]]), 
                 value = median(app_df[,top_ten[9]])
-    ),
-    
-    sliderInput("LOCALE", "Locale",
-                min = min(app_df[,top_ten[10]]), 
-                max = max(app_df[,top_ten[10]]), 
-                value = median(app_df[,top_ten[10]]),
-                step = 1
     )
-    
   ),
 
   mainPanel(
     tableOutput("table"),
+    tags$br(),
+    h4(textOutput("sol")),
+    tags$br(),
+    tags$br(),
+    h4(textOutput("text")),#cat("Similar Schools with this Profile:"),
     tableOutput("schools")
     )
   )
