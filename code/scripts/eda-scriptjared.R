@@ -177,9 +177,9 @@ pca <- prcomp(dat_eda[,cols_to_keep], scale = T)
 plot(pca, main="Scree Plot")
 
 #save png and pdf
-dev.copy(png, "../../images/eda/scree-plot.png")
+dev.copy(png, "../../images/pca/scree-plot.png")
 dev.off()
-dev.copy(pdf, "../../images/eda/scree-plot.pdf")
+dev.copy(pdf, "../../images/pca/scree-plot.pdf")
 dev.off()
 
 # PCA for BV_SCORE
@@ -189,9 +189,9 @@ autoplot(pca, data=dat_eda, colour = "BV_SCORE", alpha=.95, size=3) +
   scale_colour_gradient(limits=c(.04, .37), low="yellow2", high="red", space="Lab")
 
 #save png and pdf
-dev.copy(png, "../../images/eda/pca-best-value.png")
+dev.copy(png, "../../images/pca/pca-best-value.png")
 dev.off()
-dev.copy(pdf, "../../images/eda/pca-best-value.pdf")
+dev.copy(pdf, "../../images/pca/pca-best-value.pdf")
 dev.off()
 
 # PCA for ABOVE_MEDIAN_MINORITIES
@@ -201,9 +201,9 @@ autoplot(pca, data=dat_eda, colour = "ABOVE_MEDIAN_MINORITIES", alpha=.6, size=3
   scale_colour_gradient(limits=c(0, 1), low="goldenrod", high="navyblue", space="Lab") 
 
 #save png and pdf
-dev.copy(png, "../../images/eda/pca-enrollment-rate-minority.png")
+dev.copy(png, "../../images/pca/pca-enrollment-rate-minority.png")
 dev.off()
-dev.copy(pdf, "../../images/eda/pca-enrollment-rate-minority.pdf")
+dev.copy(pdf, "../../images/pca/pca-enrollment-rate-minority.pdf")
 dev.off()
 
 # =====================================================================================
@@ -212,9 +212,9 @@ dev.off()
 # =====================================================================================
 featurePlot(dat_eda, as.factor(dat_eda$ABOVE_MEDIAN_MINORITIES), "strip")
 #save png and pdf
-dev.copy(png, "../../images/eda/feature-plot.png")
+dev.copy(png, "../../images/pca/feature-plot.png")
 dev.off()
-dev.copy(pdf, "../../images/eda/feature-plot.pdf")
+dev.copy(pdf, "../../images/pca/feature-plot.pdf")
 dev.off()
 
 
@@ -245,9 +245,9 @@ g = ggplot(embedding, aes(x=V1, y=V2, color=Class)) +
 print(g)
 
 #save png and pdf
-dev.copy(png, "../../images/eda/tsne-best-value.png")
+dev.copy(png, "../../images/pca/tsne-best-value.png")
 dev.off()
-dev.copy(pdf, "../../images/eda/tsne-best-value.pdf")
+dev.copy(pdf, "../../images/pca/tsne-best-value.pdf")
 dev.off()
 
 
@@ -270,9 +270,9 @@ g = ggplot(embedding, aes(x=V1, y=V2, color=Class)) +
   theme_solarized() 
 print(g)
 
-dev.copy(png, "../../images/eda/tsne-above-median-minorities.png")
+dev.copy(png, "../../images/pca/tsne-above-median-minorities.png")
 dev.off()
-dev.copy(pdf, "../../images/eda/tsne-above-median-minorities.pdf")
+dev.copy(pdf, "../../images/pca/tsne-above-median-minorities.pdf")
 dev.off()
 
 # these classes look like they can be easily classified, so we'll opt for a classification method
