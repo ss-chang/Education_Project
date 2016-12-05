@@ -9,33 +9,76 @@
 
 ## File Structure  
 
-Education_Projectf/  
+Education_Project/  
 +   README.md  
 +   Makefile  
 +   LICENSE  
 +   session-info.txt  
++	session.sh  
 +   .gitignore  
 +   code/  
 	+ README.md  
-	+ functions/  
 	+ scripts/  
-		+ data-preprocess.R  	 
-	+ tests/  
+		+ calculate-best-value.R   
+		+ data-preprocessing.R  
+		+ eda-scriptjared.R   
+		+ final-xgboost-script.R  
+		+ lasso-rankings.R
+		+ pca-script.R  
+		+ session-info.R  
+		+ scrape-rankings.R  
 +   data/  
-	+ README.md    
+	+ README.md  
+	+ 2014-15-clean-data.csv  
+	+ MERGED2014_15_PP.csv  
+	+ complete-data.csv  
+	+ lasso-coeffs.RData  
+	+ lasso-ranked-coeffs.RData  
+	+ ranked-universities.RData  
+	+ weights.RData  
+	+ top-ten.RData  
+	+ xgb-model.RData  
 +   images/  
-	+ README.md   
+	+ README.md  
+	+ eda/  
+		+ autoplot.pdf    
+		+ autoplot.png    
+		+ boxplots-minority-percentage-by-value-quartiles.pdf  
+		+ boxplots-minority-percentage-by-value-quartiles.png  
+		+ boxplots-school-value-minority-Count-per-region.pdf  
+		+ boxplots-school-value-minority-Count-per-region.png  
+		+ corrplot-eda.pdf  
+		+ corrplot-eda.png  
+		+ feature-plot.pdf  
+		+ feature-plot.png  
+		+ ggdendrogram.pdf  
+		+ ggdendrogram.png  
+		+ hist-above-median-minorities.pdf  
+		+ hist-above-median-minorities.png  
+		+ hist-best-value.pdf  
+		+ hist-best-value.png  
+		+ hist-quality-index.pdf  
+		+ hist-quality-index.png  
+		+ pca-enrollment-rate-minority.pdf  
+		+ pca-enrollment-rate-minority.png  
+		+ pca-quality.pdf  
+		+ pca-quality.png  
+		+ phylo-fan.pdf  
+		+ phylo-fan.png  
+		+ phylo-unrooted.pdf  
+		+ phylo-unrooted.png  
+		+ scree-plot.pdf  
+		+ scree-plot.png  
+		+ tsne-above-median-minorities.pdf  
+		+ tsne-above-median-minorities.png  
+		+ tsne-quality-index.pdf  
+		+ tsne-quality-index.png  
+
+				
+		
 +   report/  
 	+ report.pdf  
-	+ report.Rmd  
-	+ sections/  
-		+ 00-abstract.Rmd  
-		+ 01-introduction.Rmd  
-		+ 02-data.Rmd  
-		+ 03-methods.Rmd  
-		+ 04-analysis.Rmd  
-		+ 05-results.Rmd  
-		+ 06-conclusions.Rmd  
+	+ report.rnw   
    + slides/  
 
 ## Authors  
