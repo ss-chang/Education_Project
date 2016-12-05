@@ -73,10 +73,28 @@ Education_Project/
 		+ tsne-above-median-minorities.png  
 		+ tsne-quality-index.pdf  
 		+ tsne-quality-index.png  
-	+ pca/
-		+
-				
-		
+	+ pca/  
+		+ feature-plot.pdf  
+		+ feature-plot.png  
+		+ pca-enrollment-rate-minority.pdf  
+		+ pca-enrollment-rate-minority.png  
+		+ pca-quality.pdf  
+		+ pca-quality.png  
+		+ scree-plot.pdf  
+		+ scree-plot.png  
+		+ tsne-above-median-minorities.pdf  
+		+ tsne-above-median-minorities.png  
+		+ tsne-quality-index.pdf  
+		+ tsne-quality-index.png  
+	+ xgboost/  
+		+ best-features.pdf  
+		+ best-features.png  
+		+ best-features-cumsum.pdf  
+		+ best-features-cumsum.png  
+		+ feature-importance.pdf  
+		+ feature-importance.png  
+		+ optimized-feature-importance.pdf  
+		+ optimized-feature-importance.png  	
 +   report/  
 	+ report.pdf  
 	+ report.rnw   
