@@ -25,7 +25,7 @@ df2 <- as.data.frame(apply(df2, 2, as.numeric))
 # =====================================================================================
 set.seed(1)
 # Define datasets
-train_ind <- sample(2166, 1500)
+train_ind <- sample(nrow(df2), floor(0.7*nrow(df2)))
 train <- df2[train_ind,]
 test <- df2[-train_ind,]
 # Get response labels
@@ -137,26 +137,7 @@ dev.copy(pdf, "../../images/xgboost/best-features-cumsum.pdf")
 dev.off()
 
 top_ten <- importance_matrix$Feature[1:10]
-save(top_ten,file= "top_ten.RData")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+save(top_ten,file= "../../data/top_ten.RData")
 
 # =====================================================================================
 # XGBOOST: Rerun XGBOOST with less features for more interpretability
@@ -167,9 +148,9 @@ df2$MINORITIES.1 <- NULL   # This is essentially our response = overfit
 df2$INSTNM <- NULL         # Don't need
 # Make data numeric
 df2 <- as.data.frame(apply(df2, 2, as.numeric))
-set.seed(2)
+set.seed(1)
 # Define datasets
-train_ind <- sample(2166, 1500)
+train_ind <- sample(nrow(df2), floor(0.7*nrow(df2)))
 train <- df2[train_ind,c(top_ten,"ABOVE_MEDIAN_MINORITIES")]
 test <- df2[-train_ind,c(top_ten,"ABOVE_MEDIAN_MINORITIES")]
 # Get response labels
@@ -258,7 +239,7 @@ dev.off()
 
 
 # Dave dataa
-save(bst, file = "xgb_model.RData")
+save(bst, file = "../../data/xgb_model.RData")
 
 
 
