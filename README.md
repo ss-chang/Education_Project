@@ -73,7 +73,8 @@ Education_Project/
 		+ tsne-above-median-minorities.png  
 		+ tsne-quality-index.pdf  
 		+ tsne-quality-index.png  
-
+	+ pca/
+		+
 				
 		
 +   report/  
