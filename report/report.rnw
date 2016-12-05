@@ -75,45 +75,6 @@ Step 1 of the above is self-explanatory and we selected the following variables 
 
 
 
-\begin{scriptsize}
-\begin{itemize}
-
-
-\item "X"                      "INSTNM"                 "CITY"                   "STABBR"                
-\item "ZIP"                    "PREDDEG"                "CONTROL"                "REGION"                
-\item "LOCALE"                 "CCBASIC"                "CCUGPROF"               "CCSIZSET"              
-\item "HBCU"                   "PBI"                    "ANNHI"                  "TRIBAL"              
-\item "AANAPII"                "HSI"                    "NANTI"                  "RELAFFIL"             
-\item "UGDS"                   "UGDS\_WHITE"             "UGDS\_BLACK"             "UGDS\_HISP"             
-\item "UGDS\_ASIAN"             "UGDS\_AIAN"              "UGDS\_NHPI"              "UGDS\_2MOR"             
-\item "UGDS\_NRA"               "UGDS\_UNKN"              "PPTUG\_EF"               "NPT4\_PRIV"             
-\item "NUM4\_PRIV"              "TUITIONFEE\_IN"          "INEXPFTE"               "AVGFACSAL"             
-\item "PCTPELL"                "PCTFLOAN"               "RPY\_3YR\_RT"             "COMPL\_RPY\_3YR\_RT"      
-\item "LO\_INC\_RPY\_3YR\_RT"      "MD\_INC\_RPY\_3YR\_RT"      "HI\_INC\_RPY\_3YR\_RT"      "DEP\_RPY\_3YR\_RT"        
-\item "IND\_RPY\_3YR\_RT"         "PELL\_RPY\_3YR\_RT"        "NOPELL\_RPY\_3YR\_RT"      "FEMALE\_RPY\_3YR\_RT"     
-\item "MALE\_RPY\_3YR\_RT"        "FIRSTGEN\_RPY\_3YR\_RT"    "NOTFIRSTGEN\_RPY\_3YR\_RT" "RPY\_5YR\_RT"            
-\item "COMPL\_RPY\_5YR\_RT"       "LO\_INC\_RPY\_5YR\_RT"      "DEP\_RPY\_5YR\_RT"         "IND\_RPY\_5YR\_RT"        
-\item "PELL\_RPY\_5YR\_RT"        "NOPELL\_RPY\_5YR\_RT"      "FEMALE\_RPY\_5YR\_RT"      "MALE\_RPY\_5YR\_RT"       
-\item "FIRSTGEN\_RPY\_5YR\_RT"    "NOTFIRSTGEN\_RPY\_5YR\_RT" "RPY\_7YR\_RT"             "COMPL\_RPY\_7YR\_RT"      
-\item "LO\_INC\_RPY\_7YR\_RT"      "DEP\_RPY\_7YR\_RT"         "IND\_RPY\_7YR\_RT"         "PELL\_RPY\_7YR\_RT"       
-\item "NOPELL\_RPY\_7YR\_RT"      "FEMALE\_RPY\_7YR\_RT"      "MALE\_RPY\_7YR\_RT"        "FIRSTGEN\_RPY\_7YR\_RT"   
-\item "NOTFIRSTGEN\_RPY\_7YR\_RT" "INC\_PCT\_LO"             "DEP\_STAT\_PCT\_IND"       "DEP\_INC\_PCT\_LO"        
-\item "IND\_INC\_PCT\_LO"         "PAR\_ED\_PCT\_1STGEN"      "INC\_PCT\_M1"             "INC\_PCT\_M2"            
-\item "INC\_PCT\_H1"             "INC\_PCT\_H2"             "DEP\_INC\_PCT\_M1"         "IND\_INC\_PCT\_M1"        
-\item "PAR\_ED\_PCT\_HS"          "PAR\_ED\_PCT\_PS"          "DEBT\_MDN"               "GRAD\_DEBT\_MDN"         
-\item "WDRAW\_DEBT\_MDN"         "LO\_INC\_DEBT\_MDN"        "MD\_INC\_DEBT\_MDN"        "HI\_INC\_DEBT\_MDN"       
-\item "DEP\_DEBT\_MDN"           "IND\_DEBT\_MDN"           "PELL\_DEBT\_MDN"          "NOPELL\_DEBT\_MDN"       
-\item "FEMALE\_DEBT\_MDN"        "MALE\_DEBT\_MDN"          "FIRSTGEN\_DEBT\_MDN"      "NOTFIRSTGEN\_DEBT\_MDN"  
-\item "GRAD\_DEBT\_MDN10YR"      "CUML\_DEBT\_N"            "CUML\_DEBT\_P90"          "CUML\_DEBT\_P75"         
-\item "CUML\_DEBT\_P25"          "CUML\_DEBT\_P10"          "LOAN\_EVER"              "PELL\_EVER"             
-\item "FEMALE"                 "MARRIED"                "DEPENDENT"              "FIRST\_GEN"             
-\item "FAMINC"                 "MD\_FAMINC"              "FAMINC\_IND"             "GRAD\_DEBT\_MDN\_SUPP"    
-\item "GRAD\_DEBT\_MDN10YR\_SUPP" "ICLEVEL"                "UGDS\_MEN"               "UGDS\_WOMEN"            
-\item "RANKED"                
-\end{itemize}
-\end{scriptsize}
-
-
 \medbreak
 Step 2 of the above is more involved. To create BEST VALUE, we first scraped the wh\_post (Washignton Post best school rankings)
 for rankings. Once we had our ranked schools and appended them to our dataset, we used \linebreak LASSO/XGBOOST to pick those features that were associated with a school being ranked (we treat this as a proxy for quality). We then used these variables to build a BEST-VALUE metric.
@@ -128,6 +89,9 @@ For step 3, we computed another feature importance metric, this time with our re
 \medbreak
 Step 4 is to check for correlated variables and to remove them as well.
 
+\begin{figure}[ht]
+\includegraphics[width = 75mm]{corrplot-eda}
+\end{figure}
 
 
 
