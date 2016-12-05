@@ -44,7 +44,11 @@ dat_eda <- data.frame(dat_eda)
 # =====================================================================================
 
 hist(dat_eda$QUALITY_INDEX)
-
+#save png and pdf
+dev.copy(png, "../../images/eda/hist-quality-index.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/hist-quality-index.pdf")
+dev.off()
 
 
 # Histogram
@@ -54,11 +58,25 @@ ggplot(dat_eda, aes(BV_SCORE)) +
   geom_density() +
   ggtitle("Histogram of Best Value")
 
+#save png and pdf
+dev.copy(png, "../../images/eda/hist-best-value.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/hist-best-value.pdf")
+dev.off()
+
+
+
 # Histogram
 ggthemr('dust')
 ggplot(dat_eda, aes(ABOVE_MEDIAN_MINORITIES)) +
   geom_histogram(binwidth = .5) +
   ggtitle("Histogram of ABOVE_MEDIAN_MINORITIES")
+
+#save png and pdf
+dev.copy(png, "../../images/eda/hist-above-median-minorities.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/hist-above-median-minorities.pdf")
+dev.off()
 
 
 # Boxplots by Region
@@ -67,6 +85,14 @@ ggplot(dat_eda, aes(as.factor(ABOVE_MEDIAN_MINORITIES),BV_SCORE)) +
   facet_wrap(~ REGION) +
   labs(title="Boxplots of School Value by Minority Count per Region", x="Above Median Minority",
        ylab = "BV_SCORE")
+
+#save png and pdf
+dev.copy(png, "../../images/eda/boxplots-school-value-minority-Count-per-region.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/boxplots-school-value-minority-Count-per-region.pdf")
+dev.off()
+
+
 
 
 dat_eda <- dat_eda %>%
@@ -77,6 +103,12 @@ ggplot(dat_eda, aes(as.factor(as.numeric(quantile)), MINORITIES)) +
   labs(title="Boxplots of Minority Percentage by Value Quartiles", 
        x="Quartiles of Quality_Index",
        ylab = "Minority Count")
+
+#save png and pdf
+dev.copy(png, "../../images/eda/boxplots-minority-percentage-by-value-quartiles.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/boxplots-minority-percentage-by-value-quartiles.pdf")
+dev.off()
 
 ggthemr_reset()
 
@@ -96,13 +128,40 @@ hc <- hclust(d)
 
 # MDS
 autoplot(cmdscale(d, eig = TRUE), shape=FALSE, label.size = 3, col='tomato')
+#save png and pdf
+dev.copy(png, "../../images/eda/autoplot.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/autoplot.pdf")
+dev.off()
+
 
 # Phylo Tree
 plot(as.phylo(hc), type = "fan")
+
+#save png and pdf
+dev.copy(png, "../../images/eda/phylo-fan.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/phylo-fan.pdf")
+
 plot(as.phylo(hc), type = "unrooted")
+
+#save png and pdf
+dev.copy(png, "../../images/eda/phylo-unrooted.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/phylo-unrooted.pdf")
+dev.off()
+
+
+
 # HIERARCHICAL CLUSTERING
 plot(hc, cex = 0.7)
 ggdendrogram(hc, rotate=T) + theme_solarized()
+
+#save png and pdf
+dev.copy(png, "../../images/eda/ggdendrogram.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/ggdendrogram.pdf")
+dev.off()
 
 # =====================================================================================
 # PCA
@@ -117,11 +176,23 @@ pca <- prcomp(dat_eda[,cols_to_keep], scale = T)
 
 plot(pca, main="Scree Plot")
 
+#save png and pdf
+dev.copy(png, "../../images/eda/scree-plot.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/scree-plot.pdf")
+dev.off()
+
 # PCA for QUALITY_INDEX
 autoplot(pca, data=dat_eda, colour = "BV_SCORE", alpha=.95, size=3) + 
   ggtitle("PCA of QUALITY_INDEX") +
   theme_wsj() +
   scale_colour_gradient(limits=c(.04, .37), low="yellow2", high="red", space="Lab")
+
+#save png and pdf
+dev.copy(png, "../../images/pca/pca-quality.png")
+dev.off()
+dev.copy(pdf, "../../images/pca/pca-quality.pdf")
+dev.off()
 
 # PCA for ABOVE_MEDIAN_MINORITIES
 autoplot(pca, data=dat_eda, colour = "ABOVE_MEDIAN_MINORITIES", alpha=.6, size=3, pch=4) + 
@@ -129,14 +200,22 @@ autoplot(pca, data=dat_eda, colour = "ABOVE_MEDIAN_MINORITIES", alpha=.6, size=3
   theme_wsj() + 
   scale_colour_gradient(limits=c(0, 1), low="goldenrod", high="navyblue", space="Lab") 
 
-
+#save png and pdf
+dev.copy(png, "../../images/pca/pca-enrollment-rate-minority.png")
+dev.off()
+dev.copy(pdf, "../../images/pca/pca-enrollment-rate-minority.pdf")
+dev.off()
 
 # =====================================================================================
 # Feature Plot:
 # See how minor_bin column relates to all other features
 # =====================================================================================
 featurePlot(dat_eda, as.factor(dat_eda$ABOVE_MEDIAN_MINORITIES), "strip")
-
+#save png and pdf
+dev.copy(png, "../../images/eda/feature-plot.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/feature-plot.pdf")
+dev.off()
 
 
 # =====================================================================================
@@ -165,6 +244,12 @@ g = ggplot(embedding, aes(x=V1, y=V2, color=Class)) +
   scale_colour_gradient(limits=c(.04, .37), low="yellow", high="red", space="Lab")
 print(g)
 
+#save png and pdf
+dev.copy(png, "../../images/pca/tsne-quality-index.png")
+dev.off()
+dev.copy(pdf, "../../images/pca/tsne-quality-index.pdf")
+dev.off()
+
 
 
 # t-SNE for ABOVE_MEDIAN_MINORITIES
@@ -185,15 +270,25 @@ g = ggplot(embedding, aes(x=V1, y=V2, color=Class)) +
   theme_solarized() 
 print(g)
 
+dev.copy(png, "../../images/pca/tsne-above-median-minorities.png")
+dev.off()
+dev.copy(pdf, "../../images/pca/tsne-above-median-minorities.pdf")
+dev.off()
+
 # these classes look like they can be easily classified, so we'll opt for a classification method
 
 # =====================================================================================
 # Correlation Plot
 # =====================================================================================
 set.seed(56)
-corrplot.mixed(cor(dat_eda[,sample(108,15, replace=F)]), upper="color", 
+corrplot.mixed(cor(dat_eda[,sample(108,5, replace=F)]), upper="color", 
                tl.pos="lt", diag="n", order="hclust", hclust.method="complete")
 
+#save png and pdf
+dev.copy(png, "../../images/eda/corrplot-eda.png")
+dev.off()
+dev.copy(pdf, "../../images/eda/corrplot-eda.pdf")
+dev.off()
 # Variables are fairly correlated. We can either fix this or opt for a method that can handle
 # correlation easy.
 # We'll go with the latter and choose xgboost

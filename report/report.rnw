@@ -1,16 +1,20 @@
 \documentclass{article}
-
 \title{Education Project}
 \author{Jared Wilber, Shannon Chang, Noura Kawa, Manuel Horta}
-\date{\today}
+\date{December 5, 2016}
 
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+\graphicspath{ {../images/eda/} {../images/pca/} {../images/xgboost/}}
 
 \begin{document}
+\maketitle
 \SweaveOpts{concordance=TRUE}
 
 
 \begin{abstract}
-Absstract goes here. 
+
+Our client is a non-profit NGO with an interest in minority success. They want to donate money to schools that serve minorities well. We provide a method of choosing schools which are most likely to help minority students succeed by using the "collegescorecard" data and analysis of variables that are most significant for minorities.  
 \end{abstract}
 
 \section{Introduction}
@@ -49,13 +53,12 @@ Return Model Accuracy
 \medbreak
 
 \textbf{Ranking schools}
-Describe BEST VALUE metric. We used lasso/xgboost feature importance to find the variables that US NEWS uses, then made a metric similar to theirs. After this, we ranked out data.
+We used lasso/xgboost feature importance to find the variables that US NEWS uses, then made a metric similar to theirs. Using this new BEST VALUE metric, we ranked our data.
          
-
-
 \subsection{Data}
 
 Because of fluctuations in data and the low volatility in year-to-year things (red-tape etc.), we opted to use the most recent dataset. In this way, we have access to more useful variables and also have a data set that is more likely to reflect present day. 
+
 \medbreak
 We want to identify those schools that overserve or underserve minorities. Our dataset lives in very high dimensions, so our first order of business is to reduce the dimensionality. This is important because the NGO would like to understand our methods, so our model must be interpretable. We broke this up into 4 steps:
 
@@ -70,10 +73,47 @@ Step 1 of the above is self-explanatory and we selected the following variables 
 \medbreak
 \textbf{Variable names:}
 
+\begin{scriptsize}
+\begin{itemize}
+
+
+\item "X"                      "INSTNM"                 "CITY"                   "STABBR"                
+\item "ZIP"                    "PREDDEG"                "CONTROL"                "REGION"                
+\item "LOCALE"                 "CCBASIC"                "CCUGPROF"               "CCSIZSET"              
+\item "HBCU"                   "PBI"                    "ANNHI"                  "TRIBAL"              
+\item "AANAPII"                "HSI"                    "NANTI"                  "RELAFFIL"             
+\item "UGDS"                   "UGDS\_WHITE"             "UGDS\_BLACK"             "UGDS\_HISP"             
+\item "UGDS\_ASIAN"             "UGDS\_AIAN"              "UGDS\_NHPI"              "UGDS\_2MOR"             
+\item "UGDS\_NRA"               "UGDS\_UNKN"              "PPTUG\_EF"               "NPT4\_PRIV"             
+\item "NUM4\_PRIV"              "TUITIONFEE\_IN"          "INEXPFTE"               "AVGFACSAL"             
+\item "PCTPELL"                "PCTFLOAN"               "RPY\_3YR\_RT"             "COMPL\_RPY\_3YR\_RT"      
+\item "LO\_INC\_RPY\_3YR\_RT"      "MD\_INC\_RPY\_3YR\_RT"      "HI\_INC\_RPY\_3YR\_RT"      "DEP\_RPY\_3YR\_RT"        
+\item "IND\_RPY\_3YR\_RT"         "PELL\_RPY\_3YR\_RT"        "NOPELL\_RPY\_3YR\_RT"      "FEMALE\_RPY\_3YR\_RT"     
+\item "MALE\_RPY\_3YR\_RT"        "FIRSTGEN\_RPY\_3YR\_RT"    "NOTFIRSTGEN\_RPY\_3YR\_RT" "RPY\_5YR\_RT"            
+\item "COMPL\_RPY\_5YR\_RT"       "LO\_INC\_RPY\_5YR\_RT"      "DEP\_RPY\_5YR\_RT"         "IND\_RPY\_5YR\_RT"        
+\item "PELL\_RPY\_5YR\_RT"        "NOPELL\_RPY\_5YR\_RT"      "FEMALE\_RPY\_5YR\_RT"      "MALE\_RPY\_5YR\_RT"       
+\item "FIRSTGEN\_RPY\_5YR\_RT"    "NOTFIRSTGEN\_RPY\_5YR\_RT" "RPY\_7YR\_RT"             "COMPL\_RPY\_7YR\_RT"      
+\item "LO\_INC\_RPY\_7YR\_RT"      "DEP\_RPY\_7YR\_RT"         "IND\_RPY\_7YR\_RT"         "PELL\_RPY\_7YR\_RT"       
+\item "NOPELL\_RPY\_7YR\_RT"      "FEMALE\_RPY\_7YR\_RT"      "MALE\_RPY\_7YR\_RT"        "FIRSTGEN\_RPY\_7YR\_RT"   
+\item "NOTFIRSTGEN\_RPY\_7YR\_RT" "INC\_PCT\_LO"             "DEP\_STAT\_PCT\_IND"       "DEP\_INC\_PCT\_LO"        
+\item "IND\_INC\_PCT\_LO"         "PAR\_ED\_PCT\_1STGEN"      "INC\_PCT\_M1"             "INC\_PCT\_M2"            
+\item "INC\_PCT\_H1"             "INC\_PCT\_H2"             "DEP\_INC\_PCT\_M1"         "IND\_INC\_PCT\_M1"        
+\item "PAR\_ED\_PCT\_HS"          "PAR\_ED\_PCT\_PS"          "DEBT\_MDN"               "GRAD\_DEBT\_MDN"         
+\item "WDRAW\_DEBT\_MDN"         "LO\_INC\_DEBT\_MDN"        "MD\_INC\_DEBT\_MDN"        "HI\_INC\_DEBT\_MDN"       
+\item "DEP\_DEBT\_MDN"           "IND\_DEBT\_MDN"           "PELL\_DEBT\_MDN"          "NOPELL\_DEBT\_MDN"       
+\item "FEMALE\_DEBT\_MDN"        "MALE\_DEBT\_MDN"          "FIRSTGEN\_DEBT\_MDN"      "NOTFIRSTGEN\_DEBT\_MDN"  
+\item "GRAD\_DEBT\_MDN10YR"      "CUML\_DEBT\_N"            "CUML\_DEBT\_P90"          "CUML\_DEBT\_P75"         
+\item "CUML\_DEBT\_P25"          "CUML\_DEBT\_P10"          "LOAN\_EVER"              "PELL\_EVER"             
+\item "FEMALE"                 "MARRIED"                "DEPENDENT"              "FIRST\_GEN"             
+\item "FAMINC"                 "MD\_FAMINC"              "FAMINC\_IND"             "GRAD\_DEBT\_MDN\_SUPP"    
+\item "GRAD\_DEBT\_MDN10YR\_SUPP" "ICLEVEL"                "UGDS\_MEN"               "UGDS\_WOMEN"            
+\item "RANKED"                
+\end{itemize}
+\end{scriptsize}
+
 \medbreak
 Step 2 of the above is more involved. To create BEST VALUE, we first scraped the wh\_post (Washignton Post best school rankings)
-for rankings. Once we had our ranked schools and appended them to our dataset, we used \linebreak LASSO/XGBOOST to pick those features that 
-were associated with a school being ranked (we treat this as a proxy for quality). We then used these variables to build a BEST-VALUE metric.
+for rankings. Once we had our ranked schools and appended them to our dataset, we used \linebreak LASSO/XGBOOST to pick those features that were associated with a school being ranked (we treat this as a proxy for quality). We then used these variables to build a BEST-VALUE metric.
 
 insert feature importance
 
@@ -81,34 +121,137 @@ insert feature importance
 \medbreak
 For step 3, we computed another feature importance metric, this time with our response being the minority served classification. We get rid of variables that don't contribute to our model. Because we are predicting discrete categories of minority serving, we use xgboost for feature importance.
 
-insert feature importance 2 plot
 
 \medbreak
 Step 4 is to check for correlated variables and to remove them as well.
 
-insert correlation plot
+\begin{figure}[h]
+\includegraphics [width = 75mm]{corrplot-eda}
+\caption{\textbf {This plot shows the correlation matrix between 5 random variables from the reduced data set.}}
+\end{figure}
 
 \medbreak
-Finally, we have our dataset. Now our dataset is much smaller \textbf{and} more relevant to our goals. Thus, our data is less computationally expensive, has higher predictable power, and is more interpretable.
+Finally, we have our dataset. Now our dataset is much smaller \textbf{and} more relevant to our goals. Thus, our data is less computationally expensive, has higher prediction power, and is more interpretable.
+
+We end up with a data set consisting of 110 variables. These are then sorted by significance to minorities using xgboost.
+
+\begin{figure}[h]
+\includegraphics [width = 75mm]{feature-importance}
+\caption{\textbf {Sorted significant variables.}}
+\end{figure}
+
         
-discuss new data
 
 \subsection{Exploratory Data Analysis}
 
 
------- EDA------
-        
   Plot ideas: What they reveal
-      - PCA
-      - T-sne
-      - FEATURE PLOT
-      
----- end eda ----
+    
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{hist-quality-index}
+\caption{\textbf {Histogram of the Quality Index.}}
+\end{figure}
 
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{hist-best-value}
+\caption{\textbf {Histogram of best value.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{hist-above-median-minorities}
+\caption{\textbf {Histogram of ABOVE\_MEDIAN\_MINORITIES.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{boxplots-school-value-minority-Count-per-region}
+\caption{\textbf {Boxplots of School Value by Minority Count per Region.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{boxplots-minority-percentage-by-value-quartiles}
+\caption{\textbf {Boxplots of Minority Percentage by Value Quartiles.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{autoplot}
+\caption{\textbf {IDK WHAT THIS IS.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{phylo-fan}
+\caption{\textbf {Phylo Tree.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{phylo-unrooted}
+\caption{\textbf {Phylo Tree.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{ggdendrogram}
+\caption{\textbf {HIERARCHICAL CLUSTERING.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{scree-plot}
+\caption{\textbf {Scree plot.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{pca-quality}
+\caption{\textbf {PCA of QUALITY\_INDEX}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{pca-enrollment-rate-minority}
+\caption{\textbf {PCA of Minority Enrollment Rate}}
+\end{figure}
+
+
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{feature-plot}
+\caption{\textbf {IDK WAT TO WRITE HERE}}
+\end{figure}
+
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{tsne-quality-index}
+\caption{\textbf {t-SNE 2D Embedding of School Quality.}}
+\end{figure}
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{tsne-above-median-minorities}
+\caption{\textbf {t-SNE 2D Embedding of Minority Count.}}
+\end{figure}
 
 \section{Results}
+feature importance
+xgboost - find values for minorities, use them in model
+bestvalue metric - use coefficient values from lasso on ranking to get weights + relevant columns
+optimized-feature-importance
 
-Show the above in action
+\begin{figure}[h]
+\includegraphics [width = 75mm]{feature-importance}
+\caption{\textbf {Sorted significant variables.}}
+\end{figure}
+
+
+\begin{figure}[h]
+\includegraphics [width = 75mm]{optimized-feature-importance}
+\caption{\textbf {Top 10 sorted significant variables.}}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics [width = 75mm]{best-features}
+\caption{\textbf {Gain from features.}}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics [width = 75mm]{best-features-cumsum}
+\caption{\textbf {Gain from features.}}
+\end{figure}
 
 feature importance
 xgboost - find values for minorities, use them in model
@@ -119,5 +262,17 @@ bestvalue metric - use coefficient values from lasso on ranking to get weights +
 - Model accuracy
 - whatever else
 
+\bigbreak
+#analysis train xgboost model
+#move variables out before compiling - overfill hbox
+#step 2 and 3 plots?
+#results comments
+#conclusions
+
 
 \end{document}
+
+
+
+
+
