@@ -73,6 +73,8 @@ Step 1 of the above is self-explanatory and we selected the following variables 
 \medbreak
 \textbf{Variable names:}
 
+
+
 \begin{scriptsize}
 \begin{itemize}
 
@@ -111,6 +113,7 @@ Step 1 of the above is self-explanatory and we selected the following variables 
 \end{itemize}
 \end{scriptsize}
 
+
 \medbreak
 Step 2 of the above is more involved. To create BEST VALUE, we first scraped the wh\_post (Washignton Post best school rankings)
 for rankings. Once we had our ranked schools and appended them to our dataset, we used \linebreak LASSO/XGBOOST to pick those features that were associated with a school being ranked (we treat this as a proxy for quality). We then used these variables to build a BEST-VALUE metric.
@@ -125,12 +128,10 @@ For step 3, we computed another feature importance metric, this time with our re
 \medbreak
 Step 4 is to check for correlated variables and to remove them as well.
 
-\begin{figure}[h]
-\includegraphics [width = 75mm]{corrplot-eda}
-\caption{\textbf {This plot shows the correlation matrix between 5 random variables from the reduced data set.}}
-\end{figure}
 
-\medbreak
+
+
+\bigbreak
 Finally, we have our dataset. Now our dataset is much smaller \textbf{and} more relevant to our goals. Thus, our data is less computationally expensive, has higher prediction power, and is more interpretable.
 
 We end up with a data set consisting of 110 variables. These are then sorted by significance to minorities using xgboost.
@@ -183,10 +184,7 @@ We end up with a data set consisting of 110 variables. These are then sorted by 
 \caption{\textbf {Phylo Tree.}}
 \end{figure}
 
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{phylo-unrooted}
-\caption{\textbf {Phylo Tree.}}
-\end{figure}
+
 
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{ggdendrogram}
@@ -199,7 +197,7 @@ We end up with a data set consisting of 110 variables. These are then sorted by 
 \end{figure}
 
 \begin{figure}[ht]
-\includegraphics [width = 75mm]{pca-quality}
+\includegraphics [width = 75mm]{pca-best-value}
 \caption{\textbf {PCA of QUALITY\_INDEX}}
 \end{figure}
 
@@ -212,12 +210,12 @@ We end up with a data set consisting of 110 variables. These are then sorted by 
 
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{feature-plot}
-\caption{\textbf {IDK WAT TO WRITE HERE}}
+\caption{\textbf {Feature plot.}}
 \end{figure}
 
 
 \begin{figure}[ht]
-\includegraphics [width = 75mm]{tsne-quality-index}
+\includegraphics [width = 75mm]{tsne-best-value}
 \caption{\textbf {t-SNE 2D Embedding of School Quality.}}
 \end{figure}
 
@@ -232,23 +230,23 @@ xgboost - find values for minorities, use them in model
 bestvalue metric - use coefficient values from lasso on ranking to get weights + relevant columns
 optimized-feature-importance
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \includegraphics [width = 75mm]{feature-importance}
 \caption{\textbf {Sorted significant variables.}}
 \end{figure}
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \includegraphics [width = 75mm]{optimized-feature-importance}
 \caption{\textbf {Top 10 sorted significant variables.}}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \includegraphics [width = 75mm]{best-features}
 \caption{\textbf {Gain from features.}}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \includegraphics [width = 75mm]{best-features-cumsum}
 \caption{\textbf {Gain from features.}}
 \end{figure}
@@ -262,12 +260,14 @@ bestvalue metric - use coefficient values from lasso on ranking to get weights +
 - Model accuracy
 - whatever else
 
+
+
 \bigbreak
-#analysis train xgboost model
-#move variables out before compiling - overfill hbox
-#step 2 and 3 plots?
-#results comments
-#conclusions
+analysis train xgboost model
+move variables out before compiling - overfill hbox
+step 2 and 3 plots?
+results comments
+conclusions
 
 
 \end{document}
