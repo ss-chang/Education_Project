@@ -189,9 +189,9 @@ autoplot(pca, data=dat_eda, colour = "BV_SCORE", alpha=.95, size=3) +
   scale_colour_gradient(limits=c(.04, .37), low="yellow2", high="red", space="Lab")
 
 #save png and pdf
-dev.copy(png, "../../images/pca/pca-quality.png")
+dev.copy(png, "../../images/eda/pca-quality.png")
 dev.off()
-dev.copy(pdf, "../../images/pca/pca-quality.pdf")
+dev.copy(pdf, "../../images/eda/pca-quality.pdf")
 dev.off()
 
 # PCA for ABOVE_MEDIAN_MINORITIES
@@ -201,9 +201,9 @@ autoplot(pca, data=dat_eda, colour = "ABOVE_MEDIAN_MINORITIES", alpha=.6, size=3
   scale_colour_gradient(limits=c(0, 1), low="goldenrod", high="navyblue", space="Lab") 
 
 #save png and pdf
-dev.copy(png, "../../images/pca/pca-enrollment-rate-minority.png")
+dev.copy(png, "../../images/eda/pca-enrollment-rate-minority.png")
 dev.off()
-dev.copy(pdf, "../../images/pca/pca-enrollment-rate-minority.pdf")
+dev.copy(pdf, "../../images/eda/pca-enrollment-rate-minority.pdf")
 dev.off()
 
 # =====================================================================================
@@ -245,9 +245,9 @@ g = ggplot(embedding, aes(x=V1, y=V2, color=Class)) +
 print(g)
 
 #save png and pdf
-dev.copy(png, "../../images/pca/tsne-quality-index.png")
+dev.copy(png, "../../images/eda/tsne-quality-index.png")
 dev.off()
-dev.copy(pdf, "../../images/pca/tsne-quality-index.pdf")
+dev.copy(pdf, "../../images/eda/tsne-quality-index.pdf")
 dev.off()
 
 
@@ -270,9 +270,9 @@ g = ggplot(embedding, aes(x=V1, y=V2, color=Class)) +
   theme_solarized() 
 print(g)
 
-dev.copy(png, "../../images/pca/tsne-above-median-minorities.png")
+dev.copy(png, "../../images/eda/tsne-above-median-minorities.png")
 dev.off()
-dev.copy(pdf, "../../images/pca/tsne-above-median-minorities.pdf")
+dev.copy(pdf, "../../images/eda/tsne-above-median-minorities.pdf")
 dev.off()
 
 # these classes look like they can be easily classified, so we'll opt for a classification method
