@@ -1,6 +1,6 @@
 \documentclass{article}
 \title{Education Project}
-\author{Jared Wilber, Shannon Chang, Noura Kawa, Manuel Horta}
+\author{Jared Wilber, Shannon Chang, Nura Kawa, Manuel Horta}
 \date{December 5, 2016}
 
 \usepackage{graphicx}
@@ -259,70 +259,35 @@ Because the PCA results were unconclusive, we opted to use another technique to 
 \end{figure}
 
 \section{Results}
-feature importance
-xgboost - find values for minorities, use them in model
-bestvalue metric - use coefficient values from lasso on ranking to get weights + relevant columns
-optimized-feature-importance
 
+The gradient boosting model reveals that the following predictors are most indicative:
 
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{best-features}
-\caption{\textbf {Gain from features.}}
-\end{figure}
+\begin{enumerate}
+\item Percentage of Families with Income of 75 to 100 thousand dollars anually.
+\item Percentage of Pell-grant recipients
+\item Number of Undergraduates
+\item Family Income
+\item Average Faculty Salary
+\item Hispanic Serving Institution
+\item Region
+\item Percentage of Low-Income Dependent Students
+\item Tuition, if Private Universtiy
+\item Location Type (City, Town, etc.)
+\end{enumerate}
 
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{best-features-cumsum}
-\caption{\textbf {Gain from features.}}
-\end{figure}
-
-feature importance
-xgboost - find values for minorities, use them in model
-bestvalue metric - use coefficient values from lasso on ranking to get weights + relevant columns
-
+This diverse set of predictors spans a variety of features of universities - this covers cost, location, and student profiles. This small-dimensional profile makes it by far easier and more straight-forward for an "NGO" to identify whether or not a school serves minority students. Our initial gradient boosting model had an 85 percent accuracy; however, cross-validation lead to a 95 percent accuracy in our shiny app.
 
 \section{Conclusions}
-- Model accuracy
-- whatever else
-  
-  
-  
-  \bigbreak
-analysis train xgboost model
-move variables out before compiling - overfill hbox
-step 2 and 3 plots?
-results comments
-conclusions
+Our analysis has culminated into a user-friendly app that any "NGO" can use to target universities to invest in minority education.
 
+Our final product is a shiny app that allows an "NGO" to see whether or not a new school serves minorities and finds the ten most similar universities whose profiles match that of the new school.
 
-\end{document}
+A "new school" is input by the user by adjusting the values of the top-ten features generated from fitting the gradient boosting model. The user selects from features such as "Region", "Percentage of Pell-Grant recipients", and "Average Family Income". Then, the shiny app uses the gradient boosting model to predict whether or not a school serves minorities. A distance matrix is then calculated, and the top ten most similar schools are shown.
 
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{best-features}
-\caption{\textbf {Gain from features.}}
-\end{figure}
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{best-features-cumsum}
-\caption{\textbf {Gain from features.}}
-\end{figure}
-
-feature importance
-xgboost - find values for minorities, use them in model
-bestvalue metric - use coefficient values from lasso on ranking to get weights + relevant columns
-
-
-\section{Conclusions}
-- Model accuracy
-- whatever else
-
+We also created another app that uses Principal Component Analysis. This app allows the "NGO" to visualize the relationship between variables. 
 
 
 \bigbreak
-analysis train xgboost model
-move variables out before compiling - overfill hbox
-step 2 and 3 plots?
-results comments
-conclusions
 
 
 \end{document}
