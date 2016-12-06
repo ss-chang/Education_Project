@@ -40,7 +40,6 @@ data :
 analysis: 
 	make scrape-rankings
 	make data-preprocessing
-	make rename-missing-schools
 	make lasso-rankings
 	make calculate-best-value
 	make eda
@@ -57,10 +56,6 @@ scrape-rankings:
 # Select columns relevant to our project objectives and append scraped Washinton Post data
 data-preprocessing: 
 	cd code/scripts; Rscript -e 'source("data-preprocessing.R")'
-
-# Fix naming issues to preserve data for schools that were mismatched due to formatting discrepancies
-rename-missing-schools:
-	cd code/scripts; Rscript -e 'source("rename-missing-schools.R")'
 
 # Execute LASSO regression to identify variables of importance
 lasso-rankings: 
@@ -88,7 +83,7 @@ report:
 
 # Generate slides.html file
 slides:
-	cd slides; Rscript -e "library(rmarkdown); render('slides.Rmd', 'ioslides_presentation')"
+	cd slides; pandoc slides.md -s -o slides.pdf
 
 # Clean output file
 clean:
