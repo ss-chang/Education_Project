@@ -1,15 +1,21 @@
+# =====================================================================================
+# title:   eda.R
+# author:  Jared Wilber
+# summary: 
+#          Run this script after we created our BESTVALUE and MINORITY variables
+#          Plots EDA for our variables, color coded by MINORITY and BESTVALUE
+#          Plots:
+#                1. PCA (color code for both examples, place side-by-side)          
+#                2. Feature Plot (of Minority as x-axis factor)                     
+#                3. T-sne (for both)                                                
+#                4. Histogram/density of BESTVALUE scores
+# =====================================================================================
+
+
 # Run this script after we created our BESTVALUE and MINORITY variables
-
-
-# What this script does
-# Plots EDA for our variables, color coded by MINORITY and BESTVALUE
-# Plots:
-#   1. PCA (color code for both examples, place side-by-side)          done
-#   2. Feature Plot (of Minority as x-axis factor)                     done
-#   3. T-sne (for both)                                                done
-#   4. Histogram/density of BESTVALUE scores
-
-
+# =====================================================================================
+# Loading Libraries
+# =====================================================================================
 library(corrplot)
 library(car)
 library(corrplot)
@@ -26,15 +32,20 @@ library(ape)
 library(ggdendro)
 
 # =====================================================================================
-# loading data
+# Source script
 # =====================================================================================
-
 
 source("calculate-best-value.R")
 
+# =====================================================================================
+# Load data
+# =====================================================================================
+
 dat <- dat_3
+
 # data must be numeric for eda
 dat_eda <- dat[,-106]
+
 dat_eda <- apply(dat_eda, 2, function(x) as.numeric(x))
 dat_eda <- data.frame(dat_eda)
 
@@ -44,14 +55,19 @@ dat_eda <- data.frame(dat_eda)
 # =====================================================================================
 
 hist(dat_eda$QUALITY_INDEX)
-#save png and pdf
+
+# -------------------------------------------------------------------------------------
+# save png and pdf
+# -------------------------------------------------------------------------------------
 dev.copy(png, "../../images/eda/hist-quality-index.png")
 dev.off()
 dev.copy(pdf, "../../images/eda/hist-quality-index.pdf")
 dev.off()
 
 
-# Histogram
+# -------------------------------------------------------------------------------------
+# histogram
+# -------------------------------------------------------------------------------------
 ggthemr('dust')
 ggplot(dat_eda, aes(BV_SCORE)) +
   geom_histogram(aes(y=..density..), binwidth = .018) +
@@ -65,8 +81,9 @@ dev.copy(pdf, "../../images/eda/hist-best-value.pdf")
 dev.off()
 
 
-
-# Histogram
+# -------------------------------------------------------------------------------------
+# histogram
+# -------------------------------------------------------------------------------------
 ggthemr('dust')
 ggplot(dat_eda, aes(ABOVE_MEDIAN_MINORITIES)) +
   geom_histogram(binwidth = .5) +
@@ -78,8 +95,9 @@ dev.off()
 dev.copy(pdf, "../../images/eda/hist-above-median-minorities.pdf")
 dev.off()
 
-
+# -------------------------------------------------------------------------------------
 # Boxplots by Region
+# -------------------------------------------------------------------------------------
 ggplot(dat_eda, aes(as.factor(ABOVE_MEDIAN_MINORITIES),BV_SCORE)) +
   geom_boxplot() + 
   facet_wrap(~ REGION) +
@@ -93,11 +111,12 @@ dev.copy(pdf, "../../images/eda/boxplots-school-value-minority-Count-per-region.
 dev.off()
 
 
-
-
 dat_eda <- dat_eda %>%
   mutate(quantile = ntile(BV_SCORE, 4))
+
+# -------------------------------------------------------------------------------------
 # Boxplots by Region
+# -------------------------------------------------------------------------------------
 ggplot(dat_eda, aes(as.factor(as.numeric(quantile)), MINORITIES)) +
   geom_boxplot() + 
   labs(title="Boxplots of Minority Percentage by Value Quartiles", 
@@ -113,11 +132,13 @@ dev.off()
 ggthemr_reset()
 
 # =====================================================================================
-# CLUSTERING
+# Clustering
 # =====================================================================================
 set.seed(2)
 
+# -------------------------------------------------------------------------------------
 # Make random sample so data clusters are visible
+# -------------------------------------------------------------------------------------
 random_sample_smaller <- sample(1:nrow(dat_eda), 15, replace = FALSE)
 dat_for_hclust <- dat_eda[random_sample_smaller,]
 rownames(dat_for_hclust) <- dat$INSTNM[random_sample_smaller]
@@ -125,8 +146,9 @@ rownames(dat_for_hclust) <- dat$INSTNM[random_sample_smaller]
 d <- dist(dat_for_hclust)
 hc <- hclust(d)
 
-
+# -------------------------------------------------------------------------------------
 # MDS
+# -------------------------------------------------------------------------------------
 autoplot(cmdscale(d, eig = TRUE), shape=FALSE, label.size = 3, col='tomato')
 #save png and pdf
 dev.copy(png, "../../images/eda/autoplot.png")
@@ -134,8 +156,9 @@ dev.off()
 dev.copy(pdf, "../../images/eda/autoplot.pdf")
 dev.off()
 
-
+# =====================================================================================
 # Phylo Tree
+# =====================================================================================
 plot(as.phylo(hc), type = "fan")
 
 #save png and pdf
@@ -153,7 +176,9 @@ dev.off()
 
 
 
-# HIERARCHICAL CLUSTERING
+# =====================================================================================
+# Hierarchical Clustering
+# =====================================================================================
 plot(hc, cex = 0.7)
 ggdendrogram(hc, rotate=T) + theme_solarized()
 
@@ -166,6 +191,7 @@ dev.off()
 # =====================================================================================
 # PCA
 # =====================================================================================
+
 # get data ready for pca
 non_zero_var <- as.vector(sapply(dat_eda, function(x) var(x) != 0))
 nonzero_columns <- names(dat_eda)[non_zero_var]
@@ -182,7 +208,9 @@ dev.off()
 dev.copy(pdf, "../../images/pca/scree-plot.pdf")
 dev.off()
 
+# =====================================================================================
 # PCA for BV_SCORE
+# =====================================================================================
 autoplot(pca, data=dat_eda, colour = "BV_SCORE", alpha=.95, size=3) + 
   ggtitle("PCA of BV_SCORE") +
   theme_wsj() +
@@ -194,7 +222,9 @@ dev.off()
 dev.copy(pdf, "../../images/pca/pca-best-value.pdf")
 dev.off()
 
+# =====================================================================================
 # PCA for ABOVE_MEDIAN_MINORITIES
+# =====================================================================================
 autoplot(pca, data=dat_eda, colour = "ABOVE_MEDIAN_MINORITIES", alpha=.6, size=3, pch=4) + 
   ggtitle("PCA of Minority Enrollment Rate ") +
   theme_wsj() + 
@@ -207,8 +237,7 @@ dev.copy(pdf, "../../images/pca/pca-enrollment-rate-minority.pdf")
 dev.off()
 
 # =====================================================================================
-# Feature Plot:
-# See how minor_bin column relates to all other features
+# Feature Plot:  See how minor_bin column relates to all other features
 # =====================================================================================
 featurePlot(dat_eda, as.factor(dat_eda$ABOVE_MEDIAN_MINORITIES), "strip")
 #save png and pdf
@@ -219,11 +248,11 @@ dev.off()
 
 
 # =====================================================================================
-# t-sne Plot:
+# t-sne Plot
 # =====================================================================================
 
 # t-Distributed Stochastic Neighbor Embedding
-set.seed(420)
+set.seed(420) 
 
 # t-SNE for BV_SCORE
 tsne = Rtsne(as.matrix(dat_eda), check_duplicates=FALSE, pca=TRUE, 
@@ -251,8 +280,9 @@ dev.copy(pdf, "../../images/pca/tsne-best-value.pdf")
 dev.off()
 
 
-
+# -------------------------------------------------------------------------------------
 # t-SNE for ABOVE_MEDIAN_MINORITIES
+# -------------------------------------------------------------------------------------
 tsne = Rtsne(as.matrix(dat_eda), check_duplicates=FALSE, pca=TRUE, 
              perplexity=30, theta=0.3, dims=3)
 
@@ -289,6 +319,7 @@ dev.copy(png, "../../images/eda/corrplot-eda.png")
 dev.off()
 dev.copy(pdf, "../../images/eda/corrplot-eda.pdf")
 dev.off()
+
 # Variables are fairly correlated. We can either fix this or opt for a method that can handle
 # correlation easy.
 # We'll go with the latter and choose xgboost

@@ -1,12 +1,15 @@
-# =======================================================================================
-# setting working directory
-# =======================================================================================
-setwd("C:/Users/Nura/Desktop/Education_Project/shiny-apps/")
+# =====================================================================================
+# title:   xgboost-shinyapp.R
+# author:  Nura Kawa, Jared Wilber
+# summary: fits xgboost model to user-selected data, outputs whether or not 
+#          "new college" underserves minorities. Outputs 10 similar schools.
+# =====================================================================================
 
 # =======================================================================================
 # loading libraries
 # =======================================================================================
 library(shiny)
+library(xgboost)
 
 # =======================================================================================
 # loading xgboost model items
@@ -17,8 +20,7 @@ load("../data/xgb_model.RData")
 # =======================================================================================
 # preliminary work
 # =======================================================================================
-
-dat     <- read.csv("../data/complete-data.csv", row.names = 1)
+dat <- read.csv("../data/complete-data.csv", row.names = 1)
 df2 <- dat
 df2$MINORITIES <- NULL     # This is essentially our response = overfit
 df2$MINORITIES.1 <- NULL   # This is essentially our response = overfit
@@ -42,10 +44,6 @@ num.class <- 2
 app_df <- as.data.frame(test.matrix)
 
 # =======================================================================================
-# Function to Generate Predictions
-# =======================================================================================
-
-# =======================================================================================
 # Variable Names for Table Output
 # =======================================================================================
 table_names <- c("Percent of Family Income in $75k-$110k",
@@ -57,8 +55,7 @@ table_names <- c("Percent of Family Income in $75k-$110k",
                  "Region",
                  "Percent of Low-Income Dependent Students",
                  "Average Cost, if Private University",
-                 "Location Type"
-                 )
+                 "Location Type")
 
 # =======================================================================================
 # Region Metric Conversion
@@ -77,6 +74,7 @@ region_values <- c("U.S. Service Schools",
 
 REGION <- app_df$REGION
 new_REGION <- character(length(REGION))
+
 for(i in 1:nrow(app_df)){new_REGION[i] <- region_values[REGION[i]+1]}
 app_df$NEW_REGION <- factor(new_REGION)
 
@@ -133,37 +131,32 @@ server <- function(input, output, session) {
       input$NUM4_PRIV,
       Locale_conversion$Value[which(Locale_conversion$TEXT == input$LOCALE_TEXT)] #Locale
       
-    ),ncol=1)
+    ),ncol=10)
   })
   
-  PredValue <- reactive({
-    generate_preds <- function(input_values)
-    {
-      #predict(bst, input_values)
-      max.col(t(matrix(predict(bst, input_values),
-                       nrow=num.class, 
-                       ncol=(length(predict(bst, input_values))/num.class)
-      )
-      ), "last") - 1
-    }
-    generate_preds(inputValues())
-    })
+
   
   sliderValues <-   reactive({
     data.frame(
       "Names" = table_names,
-      "Selected Values" = c(input$INC_PCT_H1,
-                            input$PCTPELL,
+      "Selected Values" = c(paste0(input$INC_PCT_H1*100, "%"),
+                            paste0(input$PCTPELL*100, "%"),
                             input$UGDS,
                             input$FAMINC,
                             input$AVGFACSAL,
-                            input$HSI,
+                            as.logical(input$HSI),
                             input$new_REGION,
-                            input$DEP_INC_PCT_LO,
+                            paste0(input$DEP_INC_PCT_LO*100, "%"),
                             input$NUM4_PRIV,
                             input$LOCALE_TEXT)
     )
     })
+  
+  PredValue <- reactive({
+    abs((predict(bst, inputValues()))[1] - (predict(bst, inputValues()))[2])
+            #rbind(app_df[,1:10],
+                  #inputValues()))[(nrow(app_df)+1)]
+  })
   
   dat2 <- dat[,c(top_ten,"INSTNM")]
   dat2$INSTNM <- as.character(dat2$INSTNM)
@@ -187,13 +180,17 @@ server <- function(input, output, session) {
     return(matrix(ten_closest_schools, ncol = 1))
   }
   
-  output$table <- renderTable(sliderValues(),
+  output$table <- renderTable(#inputValues(),
+                              sliderValues(),
                               include.rownames = FALSE)
   
-  output$sol <- renderText(
-    if(mean(PredValue()) >= 0.5){"A school with this profile serves minorities"}
-    else {"A school with this profile underserves Minorities"})
-  
+  output$sol <- renderText({
+    #PredValue()
+    if(PredValue() >= 0.5){"A school with this profile serves minorities"}
+    else {"A school with this profile underserves Minorities"}
+  })
+
+
   output$schools <- renderTable(
     close_schools_output(closeSchools()),
     include.rownames = FALSE,
@@ -279,7 +276,7 @@ ui <- pageWithSidebar(
   mainPanel(
     tableOutput("table"),
     tags$br(),
-    h4(textOutput("sol")),
+    h2(textOutput("sol")),
     tags$br(),
     tags$br(),
     h4(textOutput("text")),#cat("Similar Schools with this Profile:"),

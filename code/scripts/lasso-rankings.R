@@ -1,6 +1,9 @@
 # =====================================================================================
-# title: lasso-rankings.R
-# author: Nura Kawa
+# title:   lasso-rankings.R
+# author:  Nura Kawa
+# summary: creates MINORITIES and QUALITIES indices using PCA and LASSO 
+#          export: weights.RData
+#                  complete-data.csv
 # =====================================================================================
 
 # =====================================================================================
@@ -9,10 +12,9 @@
 library(glmnet)
 
 # =====================================================================================
-# USA Minorities
+# USA Minorities: source: https://www.census.gov/quickfacts/table/PST045215/00
 # =====================================================================================
-USA_MINORITIES <- 0.14+0.17+0.056+0.0005
-
+USA_MINORITIES <- 0.14+0.17+0.056+0.0005 #adding percentage of minority groups in USA
 
 # =====================================================================================
 # Loading Data
@@ -23,8 +25,6 @@ dat <- read.csv("../../data/2014-15-clean-data.csv",
 dat <- dat[dat$ICLEVEL==1,]
 dat <- dat[dat$RELAFFIL==-2,]
 dat <- dat[!grepl("seminary", dat$INSTNM, ignore.case = TRUE), ]
-
-colnames(dat)
 
 # =====================================================================================
 # create MINORITIES column
@@ -92,7 +92,7 @@ data_new <- data.frame(lasso_dat)[,coef_names[-1]]
 # =====================================================================================
 pca <- princomp(scale(data_new, T,T))
 
-screeplot(pca)
+#screeplot(pca)
 
 # =====================================================================================
 # Select PCA loadings
@@ -108,7 +108,7 @@ QUALITY_INDEX = as.matrix(data_new) %*% as.matrix(pca_loadings)
 
 # scale quality index
 QUALITY_INDEX <- (QUALITY_INDEX - min(QUALITY_INDEX))/(max(QUALITY_INDEX) - min(QUALITY_INDEX))
-hist(QUALITY_INDEX)
+#hist(QUALITY_INDEX)
 
 # =====================================================================================
 # Exporting
@@ -119,7 +119,6 @@ pca_loadings <- weights
 save(weights, file="../../data/weights.RData")
 
 # Export new data frame
-
 adding_cols <- data.frame("INSTNM" = dat$INSTNM,
            "MINORITIES" = MINORITIES,
            "ABOVE_MEDIAN_MINORITIES" = ABOVE_MEDIAN_MINORITIES,

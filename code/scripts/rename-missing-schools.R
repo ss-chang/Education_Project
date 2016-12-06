@@ -1,6 +1,6 @@
 # =====================================================================================
-# title: rename-missing-schools.R
-# author: Shannon Chang
+# title:   rename-missing-schools.R
+# author:  Shannon Chang
 # summary: find schools from Washington Post school rankings data that we were not 
 #          able to match with our dataset and rename schools that do exist in our 
 #          main dataset, but were not matched because of slight differences in name
@@ -24,16 +24,15 @@ wh_url <- GET(wh)
 wh_table <- readHTMLTable(rawToChar(wh_url$content), stringsAsFactors = F)
 uni_ranks1 <- wh_table[[1]]
 uni_ranks2 <- wh_table[[2]]
+
+#--------------------------------------------------------------------------------------
 # create vector of ranked school names
+#--------------------------------------------------------------------------------------
 ranked_unis <- c(uni_ranks1$Name, uni_ranks2$Name)
 
 rank_bool <- dat$INSTNM %in% ranked_unis
 
 rank_bool <- as.numeric(rank_bool)
-
-
-
-
 
 
 # =====================================================================================
@@ -42,18 +41,18 @@ rank_bool <- as.numeric(rank_bool)
 
 # this finds the schools we found
 data_we_got <- dat$INSTNM[which(rank_bool==1)]
+
 # This finds the data from wh_post that didnt we get
 didntget <- !(ranked_unis %in% data_we_got)
-
 names_didntget <- subset(ranked_unis, !(ranked_unis %in% data_we_got), Name)
-
-
 
 # =====================================================================================
 # manually rename universities that were left out to match names in our main dataset
 # =====================================================================================
 
+#--------------------------------------------------------------------------------------
 # this is the first round of renaming
+#--------------------------------------------------------------------------------------
 new_names_1 <- c("Columbia University in the City of New York", 
                  "Washington University in St Louis",
                  "University of Virginia-Main Campus", 
@@ -96,8 +95,9 @@ for (i in 1:length(new_names_1)){
 # assign a 1 to RANKED column later for the corrrect school
 rank_bool[which(dat$INSTNM == "University of St Thomas")[2]] == 1
 
-
+#--------------------------------------------------------------------------------------
 # re-run previous code to get updated vector of data from wh_post that we didn't get
+#--------------------------------------------------------------------------------------
 rank_bool <- dat$INSTNM %in% ranked_unis
 rank_bool <- as.numeric(rank_bool)
 data_we_got <- dat$INSTNM[which(rank_bool==1)]
@@ -105,8 +105,9 @@ didntget <- !(ranked_unis %in% data_we_got)
 names_didntget <- subset(ranked_unis, !(ranked_unis %in% data_we_got), Name)
 
 
-# this isthe second round of renaming
-
+#--------------------------------------------------------------------------------------
+# this is the second round of renaming
+#--------------------------------------------------------------------------------------
 new_names_2 <- c("Colorado State University-Fort Collins",
                  "The New School")
 for (i in 1:length(new_names_2)){
@@ -124,18 +125,18 @@ for (i in 1:length(new_names_2)){
 rank_bool[grep("^Arizona State University *", dat$INSTNM)] = 1
 
 
-
+#--------------------------------------------------------------------------------------
 # re-run previous code to get updated vector of data from wh_post that we didn't get
-
+#--------------------------------------------------------------------------------------
 rank_bool <- dat$INSTNM %in% ranked_unis
 rank_bool <- as.numeric(rank_bool)
 data_we_got <- dat$INSTNM[which(rank_bool==1)]
 didntget <- !(ranked_unis %in% data_we_got)
 names_didntget <- subset(ranked_unis, !(ranked_unis %in% data_we_got), Name)
 
-
+#--------------------------------------------------------------------------------------
 # this is the third round of renaming
-
+#--------------------------------------------------------------------------------------
 new_names_3 <- c("Louisiana State University and Agricultural & Mechanical College",
                  "SUNY at Albany",
                  "University of Illinois at Chicago",
@@ -165,8 +166,9 @@ names_didntget <- subset(ranked_unis, !(ranked_unis %in% data_we_got), Name)
 # The U.S. Naval, Military and Air Force Academies do not appear in our main dataset, 
 # so we will not rename them here
 
+#--------------------------------------------------------------------------------------
 # this is the fourth round of renaming
-
+#--------------------------------------------------------------------------------------
 new_names_4 <- c("Sewanee-The University of the South", 
                  "St Olaf College", 
                  "St Lawrence University", 
@@ -191,9 +193,9 @@ names_didntget <- subset(ranked_unis, !(ranked_unis %in% data_we_got), Name)
 
 # Hillsdale College does not appear in our main dataset, so we will not rename here
 
-
+#--------------------------------------------------------------------------------------
 # this is the fifth round of renaming
-
+#--------------------------------------------------------------------------------------
 new_names_5 <- c("Saint Johns University", 
                  "Saint Mary's College", 
                  "College of Saint Benedict", 
@@ -211,9 +213,9 @@ for (i in 1:length(new_names_5)){
   ranked_unis[names_to_replace_5[i]] <- new_names_5[i]
 }
 
-
+#--------------------------------------------------------------------------------------
 # re-run previous code to get updated vector of data from wh_post that we didn't get
-
+#--------------------------------------------------------------------------------------
 rank_bool <- dat$INSTNM %in% ranked_unis
 rank_bool <- as.numeric(rank_bool)
 data_we_got <- dat$INSTNM[which(rank_bool==1)]
@@ -223,9 +225,9 @@ names_didntget <- subset(ranked_unis, !(ranked_unis %in% data_we_got), Name)
 
 # Principia College does not appear in our main dataset, so we will not it rename here
 
-
+#--------------------------------------------------------------------------------------
 # this is the sixth round of renaming
-
+#--------------------------------------------------------------------------------------
 new_names_6 <- c("Saint Norbert College")
 
 for (i in 1:length(new_names_6)){
@@ -234,18 +236,16 @@ for (i in 1:length(new_names_6)){
   ranked_unis[names_to_replace_6[i]] <- new_names_6[i]
 }
 
-
+#--------------------------------------------------------------------------------------
 # re-run previous code to get updated vector of data from wh_post that we didn't get
-
+#--------------------------------------------------------------------------------------
 rank_bool <- dat$INSTNM %in% ranked_unis
 rank_bool <- as.numeric(rank_bool)
 data_we_got <- dat$INSTNM[which(rank_bool==1)]
 didntget <- !(ranked_unis %in% data_we_got)
 names_didntget <- subset(ranked_unis, !(ranked_unis %in% data_we_got), Name)
 
-
 # Grove City College does not appear in our main dataset, so we will not rename it here
-
 new_names_7 <- c("University of North Carolina at Asheville")
 
 for (i in 1:length(new_names_7)){
@@ -264,5 +264,8 @@ data_we_got <- dat$INSTNM[which(rank_bool==1)]
 didntget <- !(ranked_unis %in% data_we_got)
 names_didntget <- subset(ranked_unis, !(ranked_unis %in% data_we_got), Name)
 
+# =====================================================================================
+# Save rankings
+# =====================================================================================
 
 save(rank_bool, file = "../../data/ranked_universities.RData")
