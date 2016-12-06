@@ -1,7 +1,9 @@
-# =======================================================================================
-# setting working directory
-# =======================================================================================
-setwd("C:/Users/Nura/Desktop/Education_Project/shiny-apps/")
+# =====================================================================================
+# title:   xgboost-shinyapp.R
+# author:  Nura Kawa, Jared Wilber
+# summary: fits xgboost model to user-selected data, outputs whether or not 
+#          "new college" underserves minorities. Outputs 10 similar schools.
+# =====================================================================================
 
 # =======================================================================================
 # loading libraries
@@ -18,7 +20,7 @@ load("../data/xgb_model.RData")
 # =======================================================================================
 # preliminary work
 # =======================================================================================
-dat     <- read.csv("../data/complete-data.csv", row.names = 1)
+dat <- read.csv("../data/complete-data.csv", row.names = 1)
 df2 <- dat
 df2$MINORITIES <- NULL     # This is essentially our response = overfit
 df2$MINORITIES.1 <- NULL   # This is essentially our response = overfit
@@ -42,10 +44,6 @@ num.class <- 2
 app_df <- as.data.frame(test.matrix)
 
 # =======================================================================================
-# Function to Generate Predictions
-# =======================================================================================
-
-# =======================================================================================
 # Variable Names for Table Output
 # =======================================================================================
 table_names <- c("Percent of Family Income in $75k-$110k",
@@ -57,8 +55,7 @@ table_names <- c("Percent of Family Income in $75k-$110k",
                  "Region",
                  "Percent of Low-Income Dependent Students",
                  "Average Cost, if Private University",
-                 "Location Type"
-                 )
+                 "Location Type")
 
 # =======================================================================================
 # Region Metric Conversion
@@ -77,6 +74,7 @@ region_values <- c("U.S. Service Schools",
 
 REGION <- app_df$REGION
 new_REGION <- character(length(REGION))
+
 for(i in 1:nrow(app_df)){new_REGION[i] <- region_values[REGION[i]+1]}
 app_df$NEW_REGION <- factor(new_REGION)
 
@@ -159,34 +157,6 @@ server <- function(input, output, session) {
             #rbind(app_df[,1:10],
                   #inputValues()))[(nrow(app_df)+1)]
   })
-  
-    
-    
-    # Use best model to predict 
-    # pred <- predict(bst, rbind(test.matrix, colMeans(app_df)))
-    # head(pred, 10)  
-    # # Get accurracy of best model
-    # pred = matrix(pred, nrow=num.class, ncol=length(pred)/num.class)
-    # pred = t(pred)
-    # pred = max.col(pred, "last")
-    # pred.char = toupper(letters[pred])
-    # cat("Accuracy: ", mean(as.numeric((pred -1)== test_labels)))
-    # 
-    
-    
-    
-# (max.col(matrix(predict(bst, as.matrix(colMeans(app_df[1:i,])))[1:10],nrow=1), "last")-1)
-    
-    #generate_preds <- function(input_values)
-    #{
-    #max.col(t(matrix(predict(bst, inputValues()),
-    #                 nrow=num.class, 
-    #                 ncol=(length(predict(bst, inputValues()))/num.class)
-    #  )
-    #  ), "last") - 1
-    #generate_preds(inputValues())
-  
-  
   
   dat2 <- dat[,c(top_ten,"INSTNM")]
   dat2$INSTNM <- as.character(dat2$INSTNM)
