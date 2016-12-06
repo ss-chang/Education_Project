@@ -20,39 +20,57 @@ Our client is a non-profit NGO with an interest in minority success. Primarily, 
 \section{Introduction}
 These data are provided through federal reporting from institutions, data on federal financial aid, and
 tax information
-To help the NGO, we'll need data. We're utilizing data from [INSERT URL]. This dataset provides federally reported information about the institutions. We'll utilize this data to help an NGO achieve the following objective: determine whether a given university underserves minorities. By underserves, we mean has less than the US median percentage of minorities enrolled. If yes, determine the value the school has. This value is created by us, and will be discussed in detail below. This is where we come in. We do the following:
-
-\begin{itemize}
-      \item Classify which universities "underserve" minorities 
-      \item Create a BESTVALUE metric, which defines the value of a given university.
-\end{itemize}
-\bigbreak
+To help the NGO, we'll need data. We're utilizing data from [INSERT URL]. This dataset provides federally reported information about the institutions. We'll utilize this data to help an NGO achieve the following objective: determine whether a given university underserves minorities. By underserves, we mean has less than the US median percentage of minorities enrolled. If yes, determine the value the school has. This value is created by us, and will be discussed in detail later.
 
 In this manner, the NGO can employ us in the following 2 ways:
 
 \begin{enumerate}
 \item Given a school, predict whether or not it will underserve or overserves minorities . 
-\item Given multiple minority serving schools, determine which should receive funding (BEST VALUE METRIC).
+\item Given multiple minority serving schools, determine which should receive funding.
 \end{enumerate}
 
-We realize the first goal with a gradient-boosted tree classifier. This classifier will take in some features and output a binary label: whether or not a school underserves or adequately serves minorities
-We realize the second goal with our created metric.
+We realize the first goal with our created metric.
+We realize the second goal with a gradient-boosted tree classifier. This classifier will take in some features and output a binary label: whether or not a school underserves or adequately serves minorities
+
+\subsection{Data}
+
+As stated previously, the data is freely available at [URL]. The data contains multiple datasets, corresponding to different years.
+Because of fluctuations regarding data completion (i.e. some datasets are more sparse than others), we opted to use the most recent dataset, as it was relatively dense. Furthermore, this dataset is more likely to reflect present day. The dataset lives in very high-dimensions (roughly 1,800 features), so our first order of business was to reduce dimensions. Data-reduction is important because it allows for more interpretable results,and it's crucial that our NGO understand our methods. We also took efforts to clean the data, such as imputing NA values and "PrivacySuppressed" values. We also removed columns which were over 50 percent sparse, as these are essentially useless.. This resulted in a much sparser dataset, but one that still had a couple hundred of features (about 500 to be exact). Further dimensionality-reduction efforts are discussed later, with particular emphasis given to interpretability.
+
+Because our goal is to identify minority serving schools, we need some feature to reflect minority enrollment. This metric was created as follows:
+
+[ discuss minority metric]
+
+To determine whether or not a school underserves or adequately serves minorities, we compared the above metric to the corresponding  percantage of minorities in the US, via data we found online from [insert legitimate source]
+
+We also create a metric by which to rank universities. This is discussed in more detail in the analysis section.
+
+From a high-level, the entire data-munging is as follows:
+
+\begin{enumerate}
+  \item Hand-select important features from data. This yielded about 500 variables.
+  \item Handle unruly data (e.g. NA values, NULL values, etc.)
+  \item Create our own variables: minority, ranked, and bestvalue
+  \item Subset data based on gradient boosted tree importance
+\end{enumerate}
+
+Those methods in the above listed data-munging not already addressed will be discussed in the following analysis section.
+
+\medbreak
 
 
-
-Summary of our value: Given a list of schools, determine which schools underserve minorities. From these schools, rank them based on value.
 
 \section{Analysis}
 
 Our analysis consists of two primary objectives:
 \begin{enumerate}
-  \item Define metric used to rank schools (BEST VALUE RANKING)
-  \item Define model used to predict minority serving (XG-BOOST)
+  \item Define metric used to rank schools.
+  \item Define model used to predict minority serving.
 \end{enumerate}  
 
 \textbf{Ranking schools}
 
-In order to determine the value fo schools, we need some metric. Because the NGO wants a data-driven solution, we created this value in a data-driven manner. Creating this metric consisted of the following steps, discussed in turn:
+In order to determine the value of schools, we need some metric. Because the NGO wants a data-driven solution, we created this value in a data-driven manner. Creating this metric consisted of the following steps, discussed in turn:
 
 \begin{enumerate}
   \item Scrape US NEWS ranked universities and create ranked feature
@@ -67,7 +85,10 @@ Once we had this ranked feature, we used it as a response in a LASSO regression 
 
 Following this, we ran PCA on our smaller set of features. The scree plot for the PCA looked great, and is shown below:
 
-[INSERT SCREE PLOT]
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{scree-plot}
+\caption{\textbf {Scree plot.}}
+\end{figure}
 
 We used the loadings from the first component of our PCA as weights for our LASSO-selected features, with the idea being that they'll help provide more weight to the features. I should note that this idea (using the PCA loadings as weights in this manner) was recommended by Professor Gaston Sanchez.
 
@@ -80,44 +101,40 @@ This metric was then normalized to be between zero and one, for interpretability
 \medbreak
 
 \textbf{Train XG-Boost model}
-We used lasso/xgboost feature importance to find the variables that US NEWS uses, then made a metric similar to theirs. Using this new BEST VALUE metric, we ranked our data.
-Describe process (split into train/test, one-hot encoding, make numeric, etc.)
-Return Model Accuracy
+
+To classify whether or not schools underserve or adequately serve minorities, we use a gradient boosted tree classification model. We use this model for three primary reasons:
+1 - It's a very powerful classification technique with a high degree of accuracy.
+2 - It handles correlated data without issue.
+3 - It is interpretable in that it provides us with a means to rank features based on their importance.
+
+
+At a high-level, a gradient boosted tree is just an ensemble of weak decision trees that performs well.  Gradient boosted tree works as follows: First, we train a weak model on our data, with data drawn according to some weight distribution. Then, we keep track of how our model performed by increasing the weight of misclassified samples and decreasing the weight of correctly classified samples. Following this, we train another weak model on samples of data from our updated weight distribution. Thus, the algorithm iteratiely trains models on data that is 'difficult' to classify. This process results in an ensemble of models that are good at learning different parts of our dataset. Our boosted tree is this ensemble of models.
+
+To test our model, we split our dataset into a training set and a testing set. We used a 70 percent split.
+We then used cross-validation to identify which hyper-parameters corresponded to the best model, and used them to fit a new and improved model. Finally, as our dataset is still too large for easy interpretability, we map out the feature importance of our variables with the respect to our classification model. The benefit of our boosted tree model is that we can easily identify feature importance. We simply check the amount that each feature was used in the construction of the decision trees in the model. That is, for each tree we calculate the amount of performance improved from splitting on a given feature. We do this for all of the utilized features across all of the trees, and then average these results.  In this way we have a ranking of values that are important to our model, as seen below:
+
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{feature-importance}
+\caption{\textbf {Sorted significant variables.}}
+\end{figure}
+
+
+Because we want an easiliy useable product, we elect to choose the top ten features. We then fit another boosted-tree to this model, and repeat the training and cross-validation process. The feature importance for our new variables is displayed below:
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{optimized-feature-importance}
+\caption{\textbf {Top 10 sorted significant variables.}}
+\end{figure}
+
+Not only is this new model much more interpretable, but it is very accurate; with 95 percent accuracy we can predict whether or not a university underserves or adequately serves minorities.
+
+Now, we have a much smaller, much more interpretable data set and a very accurate model. Thus, we've created a product that the NGO can easily use: they show us 10 components of a given school [INSERT COMPONENTS], and we'll tell them whether or not they should be targeted for minority-driven funding.
+
+
          
-\subsection{Data}
-
-As stated previously, the data is freely available at [URL]. The data contains multiple datasets, corresponding to different years.
-Because of fluctuations regarding data completion (i.e. some datasets are more sparse than others), we opted to use the most recent dataset, as it was relatively dense. Furthermore, this dataset is more likely to reflect present day. The dataset lives in very high-dimensions (roughly 1,800 features), so our first order of business was to reduce dimensions. Data-reduction is important because it allows for more interpretable results,and it's crucial that our NGO understand our methods. We also took efforts to clean the data, such as imputing NA values and "PrivacySuppressed" values. We also removed columns which were over 50 percent sparse, as these are essentially useless.. This resulted in a much sparser dataset, but one that still had a couple hundred of features (about 500 to be exact). Further dimensionality-reduction efforts are discussed later, with particular emphasis given to interpretability.
-
-Because our goal is to identify minority serving schools, we need some feature to reflect minority enrollment. This metric was created as follows:
-
-[ discuss minority metric]
-
-To determine whether or not a school underserves or adequately serves minorities, we compared the above metric to the corresponding  percantage of minorities in the US, via data we found online from [insert legitimate source]
-
-[ discuss bestvalue metric]
 
 
-From a high-level, the entire data-munging is as follows:
-
-\begin{enumerate}
-  \item Hand-select important features from data. This yielded about 500 variables.
-  \item Handle missing values or 
-  \item Create our own variables, including BEST VALUE metric
-  \item From these variables, we needed to select variables that were related to minorities. We determined these variables with FEATURE IMPORTANCE (LASSO/XGBOOST).
-\end{enumerate}
-We discuss further dimensionality-reduction efforts later, with particular emphasis given to interpretability.
-
-
-\medbreak
-We want to identify those schools that overserve or underserve minorities. Our dataset lives in very high dimensions, so our first order of business is to reduce the dimensionality. This is important because the NGO would like to understand our methods, so our model must be interpretable. We broke this up into 4 steps:
-
-\begin{enumerate}
-  \item Hand-select important features from data. This yielded about 500 variables.
-  \item Create our own variables, including BEST VALUE metric
-  \item From these variables, we needed to select variables that were related to minorities. We determined these variables with FEATURE IMPORTANCE (LASSO/XGBOOST).
-  \item Remove correlated variables
-\end{enumerate}
 
 Step 1 of the above is self-explanatory and we selected the following variables (column names):
 \medbreak
@@ -210,33 +227,35 @@ The above correlation plot is just a small sample of our features. However, the 
 \caption{\textbf {HIERARCHICAL CLUSTERING.}}
 \end{figure}
 
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{scree-plot}
-\caption{\textbf {Scree plot.}}
-\end{figure}
 
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{pca-best-value}
 \caption{\textbf {PCA of QUALITY\_INDEX}}
 \end{figure}
 
+The PCA plot for our best value metric shows a pretty good degree of separation. We can see that the colors appear to disperse in groups, with similar scores clustering together.
+
+
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{pca-enrollment-rate-minority}
 \caption{\textbf {PCA of Minority Enrollment Rate}}
 \end{figure}
 
-
+PCA of our minority classification metric also shows some degree of separation. It appears that the primary source of separation between minority counts is across the y-axis. 
 
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{feature-plot}
 \caption{\textbf {Feature plot.}}
 \end{figure}
 
+The feature plot reveals the degree to which our minority metric varies by feature. For a lot of features, there appears to be little variation/effect. Although some features show different values from others, the majority show little fluctuation between minority serving amount. We'll investigate which features affect minority serving in more detail later.
 
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{tsne-best-value}
 \caption{\textbf {t-SNE 2D Embedding of School Quality.}}
 \end{figure}
+
+Because the PCA results were unconclusive, we opted to use another technique to view our high-dimensional data. Whereas PCA will reduce the dimensions of the dataset (and thus mutate it), t-SNE (t-stochastic neighborhood embeddings) won't change our data. Instead, it computes a distance between our observations, then plots that distance in small dimensions. In this case, our data is plotted into two dimensions and color-coded by Best-Value. 
 
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{tsne-above-median-minorities}
@@ -249,16 +268,6 @@ xgboost - find values for minorities, use them in model
 bestvalue metric - use coefficient values from lasso on ranking to get weights + relevant columns
 optimized-feature-importance
 
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{feature-importance}
-\caption{\textbf {Sorted significant variables.}}
-\end{figure}
-
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{optimized-feature-importance}
-\caption{\textbf {Top 10 sorted significant variables.}}
-\end{figure}
 
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{best-features}
