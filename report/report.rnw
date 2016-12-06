@@ -14,34 +14,39 @@
 
 \begin{abstract}
 
-Our client is a non-profit NGO with an interest in minority success. Primarily, they'd like to identify schools that underserve minorities so that they can donate money to those schools to create more effective minority-targeting. They don't want their money to go to waste, so they'd like to target the best schools they can. We help in two ways. First, we provide a method for identifying those schools which underserve minorities. Second, we define a data-driven metric value metric that can be used to rank the schools.
+Our client is a non-profit NGO with an interest in minority success. Primarily, they'd like to identify schools that underserve minorities so that they can donate money to those schools in an effort to increase minority enrollment. They don't want their money to go to waste, so they'd like to target the best schools they can. We help in two ways. First, we provide a method for identifying those schools which underserve minorities. Second, we define a data-driven metric value metric that can be used to rank the schools.
 \end{abstract}
 
 \section{Introduction}
-These data are provided through federal reporting from institutions, data on federal financial aid, and
-tax information
-To help the NGO, we'll need data. We're utilizing data from [INSERT URL]. This dataset provides federally reported information about the institutions. We'll utilize this data to help an NGO achieve the following objective: determine whether a given university underserves minorities. By underserves, we mean has less than the US median percentage of minorities enrolled. If yes, determine the value the school has. This value is created by us, and will be discussed in detail later.
+
+To help the NGO, we'll need data. We're utilizing data from [INSERT URL]. This dataset provides federally reported information about universities in the United States of America. We'll utilize this data to help the NGO achieve the following objective: determine whether a given university underserves minorities. By underserves, we mean has less than the US median percentage of minorities enrolled. We also create a data-driven metric that ranks the value of universities. Our analysis culminates in a user-friendly app that the NGO will use to identify whether or not a university serves minorities. The app also lists similar universities ranked in order of the value metric we created.
 
 In this manner, the NGO can employ us in the following 2 ways:
 
 \begin{enumerate}
-\item Given a school, predict whether or not it will underserve or overserves minorities . 
-\item Given multiple minority serving schools, determine which should receive funding.
+\item  Given multiple minority serving schools, determine which should receive funding.
+\item Given a school, predict whether or not it will underserve or overserves minorities.
 \end{enumerate}
 
 We realize the first goal with our created metric.
-We realize the second goal with a gradient-boosted tree classifier. This classifier will take in some features and output a binary label: whether or not a school underserves or adequately serves minorities
+We realize the second goal with our classifier, which takes in some features as input and outputs a binary label: whether or not a school underserves or adequately serves minorities.
+
+
 
 \subsection{Data}
 
-As stated previously, the data is freely available at [URL]. The data contains multiple datasets, corresponding to different years.
-Because of fluctuations regarding data completion (i.e. some datasets are more sparse than others), we opted to use the most recent dataset, as it was relatively dense. Furthermore, this dataset is more likely to reflect present day. The dataset lives in very high-dimensions (roughly 1,800 features), so our first order of business was to reduce dimensions. Data-reduction is important because it allows for more interpretable results,and it's crucial that our NGO understand our methods. We also took efforts to clean the data, such as imputing NA values and "PrivacySuppressed" values. We also removed columns which were over 50 percent sparse, as these are essentially useless.. This resulted in a much sparser dataset, but one that still had a couple hundred of features (about 500 to be exact). Further dimensionality-reduction efforts are discussed later, with particular emphasis given to interpretability.
+As stated previously, the data is freely available at collegescorecard.ed.gov. The data contains multiple datasets, each corresponding to a different year.
+Because of fluctuations regarding data completion (i.e. some datasets are more sparse than others), we opted to use the most recent dataset, as it was relatively dense. Furthermore, this dataset is more likely to reflect present day trends. 
+
+The dataset lives in very high-dimensions (roughly eighteen-hundred features), so our first order of business was to reduce dimensions. Data-reduction is important because it allows for more interpretable results,and it's crucial that our NGO understand our methods. We also took efforts to clean the data, such as imputing NA values and "PrivacySuppressed" values. We also removed columns which were over fifty percent sparse, as these are essentially useless. Following this, we used regular expressions to clean up university names and subset our data to four-year universities only. This resulted in a much sparser dataset, but one that still had a couple hundred of features (about five-hundred to be exact). Further dimensionality-reduction efforts are discussed later, with particular emphasis given to interpretability.
 
 Because our goal is to identify minority serving schools, we need some feature to reflect minority enrollment. This metric was created as follows:
 
-[ discuss minority metric]
 
-To determine whether or not a school underserves or adequately serves minorities, we compared the above metric to the corresponding  percantage of minorities in the US, via data we found online from [insert legitimate source]
+Using the data documentation we identified columns in our dataset that measured the percentage of students that identified as: Black, Asian, Hispanic, Pacific Islander, or two or more races. We simply added these columns to create a metric that measures the percentage of minorities that a school has.
+
+
+To determine whether or not a school underserves or adequately serves minorities, we compared the above metric to the corresponding  percantage of minorities in the US, via data we found online from the US Census.
 
 We also create a metric by which to rank universities. This is discussed in more detail in the analysis section.
 
@@ -75,7 +80,7 @@ In order to determine the value of schools, we need some metric. Because the NGO
 \begin{enumerate}
   \item Scrape US NEWS ranked universities and create ranked feature
   \item Run LASSO with ranked feature on response 
-  \item Run PCA on obtained results, use loadings from first component as weights
+  \item Run 'PCA' on obtained results, use loadings from first component as weights
   \item Create a weighted metric that mirrors that which US NEWS uses, using the above PCA-weighted features.
 \end{enumerate}
 
@@ -90,13 +95,15 @@ Following this, we ran PCA on our smaller set of features. The scree plot for th
 \caption{\textbf {Scree plot.}}
 \end{figure}
 
-We used the loadings from the first component of our PCA as weights for our LASSO-selected features, with the idea being that they'll help provide more weight to the features. I should note that this idea (using the PCA loadings as weights in this manner) was recommended by Professor Gaston Sanchez.
+We used the loadings from the first component of our PCA as weights for our LASSO-selected features, with the idea being that they'll help provide more weight to the features. I should note that this idea (using the PCA loadings as weights in this manner) was recommended by Professor Gaston Sanchez. This newly created metric is called QUALITY\_INDEX.
 
-Finally, after obtaining a new, much smaller set of weighted features related to ranking, we created our metric. In creating this metric, we wanted to mirror the ranking process by the 'holy grail' of school rankings, US NEWS. The ranking is as follows:
+Finally, after obtaining a new, much smaller set of weighted features related to ranking, we created our metric. In creating this metric, we wanted to mirror the ranking process by the 'holy grail' of school rankings, US News \& Reports. The ranking is formulated as follows:
 
-[INSERT BESTVALUE RANKING]
+\medbreak
+BV\_SCORE = .60*(QUALITY\_INDEX/DISCOUNTED\_TOTAL\_COST) + .25*PCTPELL + .15*(DISCOUNTED\_TOTAL\_COST/STICKER\_PRICE)
+\medbreak
 
-This metric was then normalized to be between zero and one, for interpretability.
+This metric was then normalized to be between zero and one-half, for interpretability.
 
 \medbreak
 
@@ -189,11 +196,6 @@ The above correlation plot is just a small sample of our features. However, the 
 \caption{\textbf {Histogram of the Quality Index.}}
 \end{figure}
 
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{hist-best-value}
-\caption{\textbf {Histogram of best value.}}
-\end{figure}
 
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{hist-above-median-minorities}
@@ -299,8 +301,3 @@ conclusions
 
 
 \end{document}
-
-
-
-
-
