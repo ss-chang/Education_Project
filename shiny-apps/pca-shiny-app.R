@@ -103,7 +103,7 @@ server <- function(input, output) {
   })
   
   output$pcaPlot <- renderPlot({
-    autoplot(pca, data=dat_eda, colour = selectedColumn(), alpha=.6, size=3, pch=4) + 
+    autoplot(pca, data=dat_eda, colour = selectedColumn(), alpha=.6, size=8.5, pch=3) + 
       ggtitle(paste0("PCA of ", selectedColumn())) +
       theme_wsj() + 
       geom_text(label = row.names(dat_eda), size = 3) + 
