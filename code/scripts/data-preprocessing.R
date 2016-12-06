@@ -76,7 +76,6 @@ jared_names <- strsplit(jared_names, ",")[[1]]
 
 manny_names <- c(
   'INSTNM',
-  'ï..UNITID',
   'CITY',
   'STABBR',
   'ZIP',
