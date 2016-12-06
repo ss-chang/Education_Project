@@ -7,6 +7,7 @@ setwd("C:/Users/Nura/Desktop/Education_Project/shiny-apps/")
 # loading libraries
 # =======================================================================================
 library(shiny)
+library(xgboost)
 
 # =======================================================================================
 # loading xgboost model items
@@ -17,7 +18,6 @@ load("../data/xgb_model.RData")
 # =======================================================================================
 # preliminary work
 # =======================================================================================
-
 dat     <- read.csv("../data/complete-data.csv", row.names = 1)
 df2 <- dat
 df2$MINORITIES <- NULL     # This is essentially our response = overfit
@@ -133,37 +133,60 @@ server <- function(input, output, session) {
       input$NUM4_PRIV,
       Locale_conversion$Value[which(Locale_conversion$TEXT == input$LOCALE_TEXT)] #Locale
       
-    ),ncol=1)
+    ),ncol=10)
   })
   
-  PredValue <- reactive({
-    generate_preds <- function(input_values)
-    {
-      #predict(bst, input_values)
-      max.col(t(matrix(predict(bst, input_values),
-                       nrow=num.class, 
-                       ncol=(length(predict(bst, input_values))/num.class)
-      )
-      ), "last") - 1
-    }
-    generate_preds(inputValues())
-    })
+
   
   sliderValues <-   reactive({
     data.frame(
       "Names" = table_names,
-      "Selected Values" = c(input$INC_PCT_H1,
-                            input$PCTPELL,
+      "Selected Values" = c(paste0(input$INC_PCT_H1*100, "%"),
+                            paste0(input$PCTPELL*100, "%"),
                             input$UGDS,
                             input$FAMINC,
                             input$AVGFACSAL,
-                            input$HSI,
+                            as.logical(input$HSI),
                             input$new_REGION,
-                            input$DEP_INC_PCT_LO,
+                            paste0(input$DEP_INC_PCT_LO*100, "%"),
                             input$NUM4_PRIV,
                             input$LOCALE_TEXT)
     )
     })
+  
+  PredValue <- reactive({
+    abs((predict(bst, inputValues()))[1] - (predict(bst, inputValues()))[2])
+            #rbind(app_df[,1:10],
+                  #inputValues()))[(nrow(app_df)+1)]
+  })
+  
+    
+    
+    # Use best model to predict 
+    # pred <- predict(bst, rbind(test.matrix, colMeans(app_df)))
+    # head(pred, 10)  
+    # # Get accurracy of best model
+    # pred = matrix(pred, nrow=num.class, ncol=length(pred)/num.class)
+    # pred = t(pred)
+    # pred = max.col(pred, "last")
+    # pred.char = toupper(letters[pred])
+    # cat("Accuracy: ", mean(as.numeric((pred -1)== test_labels)))
+    # 
+    
+    
+    
+# (max.col(matrix(predict(bst, as.matrix(colMeans(app_df[1:i,])))[1:10],nrow=1), "last")-1)
+    
+    #generate_preds <- function(input_values)
+    #{
+    #max.col(t(matrix(predict(bst, inputValues()),
+    #                 nrow=num.class, 
+    #                 ncol=(length(predict(bst, inputValues()))/num.class)
+    #  )
+    #  ), "last") - 1
+    #generate_preds(inputValues())
+  
+  
   
   dat2 <- dat[,c(top_ten,"INSTNM")]
   dat2$INSTNM <- as.character(dat2$INSTNM)
@@ -187,13 +210,17 @@ server <- function(input, output, session) {
     return(matrix(ten_closest_schools, ncol = 1))
   }
   
-  output$table <- renderTable(sliderValues(),
+  output$table <- renderTable(#inputValues(),
+                              sliderValues(),
                               include.rownames = FALSE)
   
-  output$sol <- renderText(
-    if(mean(PredValue()) >= 0.5){"A school with this profile serves minorities"}
-    else {"A school with this profile underserves Minorities"})
-  
+  output$sol <- renderText({
+    #PredValue()
+    if(PredValue() >= 0.5){"A school with this profile serves minorities"}
+    else {"A school with this profile underserves Minorities"}
+  })
+
+
   output$schools <- renderTable(
     close_schools_output(closeSchools()),
     include.rownames = FALSE,
@@ -279,7 +306,7 @@ ui <- pageWithSidebar(
   mainPanel(
     tableOutput("table"),
     tags$br(),
-    h4(textOutput("sol")),
+    h2(textOutput("sol")),
     tags$br(),
     tags$br(),
     h4(textOutput("text")),#cat("Similar Schools with this Profile:"),
