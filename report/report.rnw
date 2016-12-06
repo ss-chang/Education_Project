@@ -107,6 +107,87 @@ This metric was then normalized to be between zero and one-half, for interpretab
 
 \medbreak
 
+
+\subsection{Exploratory Data Analysis}
+
+After creating the dataset, variable relationships were analyzed with exploratory data analysis.
+
+
+Correlation Plot
+
+\begin{figure}[ht]
+\includegraphics[width = 75mm]{corrplot-eda}
+\end{figure}
+
+The above correlation plot is just a small sample of our features. However, the trend remains the same: our variables feature a relatviely high-degree of correlation. Because we'll need this data for a classification task (predicting minority service), it's important to recognize this as it can effect our classification. For this reason, we use a gradient-boosted tree for our analysis, as it easily handles correlated data.
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{hist-above-median-minorities}
+\caption{\textbf {Histogram of ABOVE\_MEDIAN\_MINORITIES.}}
+\end{figure}
+This barplot displays the proportion of minority students present in schools. There are more schools that have a below-median percentage of minority students.
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{boxplots-school-value-minority-Count-per-region}
+\caption{\textbf {Boxplots of School Value by Minority Count per Region.}}
+\end{figure}
+
+For each region we show the distribution of a school's value (as indicated by our best-value metric) with respect to whether or not it has at least median proportion of minority students. We notice a difference in regions, but on average we see that schools with higher proportion of minority students have higher values. This makes sense given how we constructed our best-value metric.
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{boxplots-minority-percentage-by-value-quartiles}
+\caption{\textbf {Boxplots of Minority Percentage by Value Quartiles.}}
+\end{figure}
+
+We display boxplots of minority count per quartile of best-value. Given how our best-value index was constructed, it makes sense to see that on average, higher minority count indicates higher value.
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{autoplot}
+\caption{\textbf {Multi-Dimesional Scaling.}}
+\end{figure}
+
+This is a plot of multi-dimensional scaling of universities, given our data. We notice that universities that we expect to be close to each are indeed located similarly. 
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{ggdendrogram}
+\caption{\textbf {HIERARCHICAL CLUSTERING.}}
+\end{figure}
+
+This dendrogram was produced after clustering a random selection of universities. It displays similarities based on our clustering index.  
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{pca-best-value}
+\caption{\textbf {PCA of QUALITY\_INDEX}}
+\end{figure}
+
+The PCA plot for our best value metric shows a pretty good degree of separation. We can see that the colors appear to disperse in groups, with similar scores clustering together.
+
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{pca-enrollment-rate-minority}
+\caption{\textbf {PCA of Minority Enrollment Rate}}
+\end{figure}
+
+PCA of our minority classification metric also shows some degree of separation. It appears that the primary source of separation between minority counts is across the y-axis. 
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{feature-plot}
+\caption{\textbf {Feature plot.}}
+\end{figure}
+
+The feature plot reveals the degree to which our minority metric varies by feature. For a lot of features, there appears to be little variation/effect. Although some features show different values from others, the majority show little fluctuation between minority serving amount. We'll investigate which features affect minority serving in more detail later.
+
+
+\begin{figure}[ht]
+\includegraphics [width = 75mm]{tsne-above-median-minorities}
+\caption{\textbf {t-SNE 2D Embedding of Minority Count.}}
+\end{figure}
+
+Because the PCA results were inconclusive, we opted to use another technique to view our high-dimensional data. Whereas PCA will reduce the dimensions of the dataset (and thus mutate it), t-SNE (t-stochastic neighborhood embeddings) won't change our data. Instead, it computes a distance between our observations, then plots that distance in small dimensions. In this case, our data is plotted into two dimensions and color-coded by Minority. The t-SNE plot reveals more fine-grained clusters than does the PCA plot.
+
+
+
+
 \textbf{Train XG-Boost model}
 
 To classify whether or not schools underserve or adequately serve minorities, we use a gradient boosted tree classification model. We use this model for three primary reasons:
@@ -136,127 +217,8 @@ Because we want an easiliy useable product, we elect to choose the top ten featu
 
 Not only is this new model much more interpretable, but it is very accurate; with 95 percent accuracy we can predict whether or not a university underserves or adequately serves minorities.
 
-Now, we have a much smaller, much more interpretable data set and a very accurate model. Thus, we've created a product that the NGO can easily use: they show us 10 components of a given school [INSERT COMPONENTS], and we'll tell them whether or not they should be targeted for minority-driven funding.
+Now, we have a much smaller, much more interpretable data set and a very accurate model. Thus, we've created a product that the NGO can easily use: they show us 10 components of a given school (seen the results section), and we'll tell them whether or not they should be targeted for minority-driven funding.
 
-
-
-
-
-
-Step 1 of the above is self-explanatory and we selected the following variables (column names):
-\medbreak
-\textbf{Variable names:}
-
-
-
-\medbreak
-Step 2 of the above is more involved. To create BEST VALUE, we first scraped the wh\_post (Washignton Post best school rankings)
-for rankings. Once we had our ranked schools and appended them to our dataset, we used \linebreak LASSO/XGBOOST to pick those features that were associated with a school being ranked (we treat this as a proxy for quality). We then used these variables to build a BEST-VALUE metric.
-
-insert feature importance
-
-
-\medbreak
-For step 3, we computed another feature importance metric, this time with our response being the minority served classification. We get rid of variables that don't contribute to our model. Because we are predicting discrete categories of minority serving, we use xgboost for feature importance.
-
-
-\medbreak
-Step 4 is to check for correlated variables and to remove them as well.
-
-
-
-\bigbreak
-Finally, we have our dataset. Now our dataset is much smaller \textbf{and} more relevant to our goals. Thus, our data is less computationally expensive, has higher prediction power, and is more interpretable.
-
-We end up with a data set consisting of 110 variables. These are then sorted by significance to minorities using xgboost.
-
-
-\subsection{Exploratory Data Analysis}
-
-After creating the dataset, variable relationships were analyzed with exploratory data analysis.
-
-
-Correlation Plot
-
-\begin{figure}[ht]
-\includegraphics[width = 75mm]{corrplot-eda}
-\end{figure}
-
-The above correlation plot is just a small sample of our features. However, the trend remains the same: our variables feature a relatviely high-degree of correlation. Because we'll need this data for a classification task (predicting minority service), it's important to recognize this as it can effect our classification. For this reason, we use a gradient-boosted tree for our analysis, as it easily handles correlated data.
-
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{hist-quality-index}
-\caption{\textbf {Histogram of the Quality Index.}}
-\end{figure}
-
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{hist-above-median-minorities}
-\caption{\textbf {Histogram of ABOVE\_MEDIAN\_MINORITIES.}}
-\end{figure}
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{boxplots-school-value-minority-Count-per-region}
-\caption{\textbf {Boxplots of School Value by Minority Count per Region.}}
-\end{figure}
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{boxplots-minority-percentage-by-value-quartiles}
-\caption{\textbf {Boxplots of Minority Percentage by Value Quartiles.}}
-\end{figure}
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{autoplot}
-\caption{\textbf {IDK WHAT THIS IS.}}
-\end{figure}
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{phylo-fan}
-\caption{\textbf {Phylo Tree.}}
-\end{figure}
-
-
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{ggdendrogram}
-\caption{\textbf {HIERARCHICAL CLUSTERING.}}
-\end{figure}
-
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{pca-best-value}
-\caption{\textbf {PCA of QUALITY\_INDEX}}
-\end{figure}
-
-The PCA plot for our best value metric shows a pretty good degree of separation. We can see that the colors appear to disperse in groups, with similar scores clustering together.
-
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{pca-enrollment-rate-minority}
-\caption{\textbf {PCA of Minority Enrollment Rate}}
-\end{figure}
-
-PCA of our minority classification metric also shows some degree of separation. It appears that the primary source of separation between minority counts is across the y-axis. 
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{feature-plot}
-\caption{\textbf {Feature plot.}}
-\end{figure}
-
-The feature plot reveals the degree to which our minority metric varies by feature. For a lot of features, there appears to be little variation/effect. Although some features show different values from others, the majority show little fluctuation between minority serving amount. We'll investigate which features affect minority serving in more detail later.
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{tsne-best-value}
-\caption{\textbf {t-SNE 2D Embedding of School Quality.}}
-\end{figure}
-
-Because the PCA results were unconclusive, we opted to use another technique to view our high-dimensional data. Whereas PCA will reduce the dimensions of the dataset (and thus mutate it), t-SNE (t-stochastic neighborhood embeddings) won't change our data. Instead, it computes a distance between our observations, then plots that distance in small dimensions. In this case, our data is plotted into two dimensions and color-coded by Best-Value. 
-
-\begin{figure}[ht]
-\includegraphics [width = 75mm]{tsne-above-median-minorities}
-\caption{\textbf {t-SNE 2D Embedding of Minority Count.}}
-\end{figure}
 
 \section{Results}
 
