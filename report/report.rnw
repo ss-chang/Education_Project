@@ -14,25 +14,29 @@
 
 \begin{abstract}
 
-Our client is a non-profit NGO with an interest in minority success. They want to donate money to schools that serve minorities well. We provide a method of choosing schools which are most likely to help minority students succeed by using the "collegescorecard" data and analysis of variables that are most significant for minorities.  
+Our client is a non-profit NGO with an interest in minority success. Primarily, they'd like to identify schools that underserve minorities so that they can donate money to those schools to create more effective minority-targeting. They don't want their money to go to waste, so they'd like to target the best schools they can. We help in two ways. First, we provide a method for identifying those schools which underserve minorities. Second, we define a data-driven metric value metric that can be used to rank the schools.
 \end{abstract}
 
 \section{Introduction}
-
-Our Question: A minority-focused NGO wants to donate money to schools in an effort to help increase minority success. In order to do this, they need to identify those schools that "underserve" minority students. As they may have multiple schools in consideration, they'd also like a way to determine which of the underserving schools deserves funding.This is where we come in. We do the following:
+These data are provided through federal reporting from institutions, data on federal financial aid, and
+tax information
+To help the NGO, we'll need data. We're utilizing data from [INSERT URL]. This dataset provides federally reported information about the institutions. We'll utilize this data to help an NGO achieve the following objective: determine whether a given university underserves minorities. By underserves, we mean has less than the US median percentage of minorities enrolled. If yes, determine the value the school has. This value is created by us, and will be discussed in detail below. This is where we come in. We do the following:
 
 \begin{itemize}
-      \item Determine which universities "underserve" minorities (XGBOOST)
-      \item Using a created BESTVALUE metric, rank universities based on how "good" they are.
+      \item Classify which universities "underserve" minorities 
+      \item Create a BESTVALUE metric, which defines the value of a given university.
 \end{itemize}
 \bigbreak
 
-Thus, the NGO can employ us in the following 2 ways:
+In this manner, the NGO can employ us in the following 2 ways:
 
 \begin{enumerate}
-\item Given a school, predict whether or not it will underserve or overserves minorities (XGBOOST). 
-\item Given multiple minority serving schools, determine which should give funding (BEST VALUE METRIC).
+\item Given a school, predict whether or not it will underserve or overserves minorities . 
+\item Given multiple minority serving schools, determine which should receive funding (BEST VALUE METRIC).
 \end{enumerate}
+
+We realize the first goal with a gradient-boosted tree classifier. This classifier will take in some features and output a binary label: whether or not a school underserves or adequately serves minorities
+We realize the second goal with our created metric.
 
 
 
@@ -42,22 +46,68 @@ Summary of our value: Given a list of schools, determine which schools underserv
 
 Our analysis consists of two primary objectives:
 \begin{enumerate}
-  \item Define model used to predict minority serving (XG-BOOST)
   \item Define metric used to rank schools (BEST VALUE RANKING)
+  \item Define model used to predict minority serving (XG-BOOST)
 \end{enumerate}  
 
-\textbf{Train XG-Boost model}
-Describe process (split into train/test, one-hot encoding, make numeric, etc.)
-Return Model Accuracy
+\textbf{Ranking schools}
+
+In order to determine the value fo schools, we need some metric. Because the NGO wants a data-driven solution, we created this value in a data-driven manner. Creating this metric consisted of the following steps, discussed in turn:
+
+\begin{enumerate}
+  \item Scrape US NEWS ranked universities and create ranked feature
+  \item Run LASSO with ranked feature on response 
+  \item Run PCA on obtained results, use loadings from first component as weights
+  \item Create a weighted metric that mirrors that which US NEWS uses, using the above PCA-weighted features.
+\end{enumerate}
+
+Our first step was to create a column that detailed whether or not a given university was ranked or not. To achieve this, we scraped US NEWS rankings online from the Washington Post and merged them into our dataset. After the data was merged, we created a new binary feature that identified whether or not a university was ranked.
+
+Once we had this ranked feature, we used it as a response in a LASSO regression model. We did this because LASSO will select features associated with the response; thus, this provided us with a much smaller set of features (HOW MANY) most associated with a university being ranked. They features made sense intuitively and included things such as average debt level and graduation rates.
+
+Following this, we ran PCA on our smaller set of features. The scree plot for the PCA looked great, and is shown below:
+
+[INSERT SCREE PLOT]
+
+We used the loadings from the first component of our PCA as weights for our LASSO-selected features, with the idea being that they'll help provide more weight to the features. I should note that this idea (using the PCA loadings as weights in this manner) was recommended by Professor Gaston Sanchez.
+
+Finally, after obtaining a new, much smaller set of weighted features related to ranking, we created our metric. In creating this metric, we wanted to mirror the ranking process by the 'holy grail' of school rankings, US NEWS. The ranking is as follows:
+
+[INSERT BESTVALUE RANKING]
+
+This metric was then normalized to be between zero and one, for interpretability.
 
 \medbreak
 
-\textbf{Ranking schools}
+\textbf{Train XG-Boost model}
 We used lasso/xgboost feature importance to find the variables that US NEWS uses, then made a metric similar to theirs. Using this new BEST VALUE metric, we ranked our data.
+Describe process (split into train/test, one-hot encoding, make numeric, etc.)
+Return Model Accuracy
          
 \subsection{Data}
 
-Because of fluctuations in data and the low volatility in year-to-year things (red-tape etc.), we opted to use the most recent dataset. In this way, we have access to more useful variables and also have a data set that is more likely to reflect present day. 
+As stated previously, the data is freely available at [URL]. The data contains multiple datasets, corresponding to different years.
+Because of fluctuations regarding data completion (i.e. some datasets are more sparse than others), we opted to use the most recent dataset, as it was relatively dense. Furthermore, this dataset is more likely to reflect present day. The dataset lives in very high-dimensions (roughly 1,800 features), so our first order of business was to reduce dimensions. Data-reduction is important because it allows for more interpretable results,and it's crucial that our NGO understand our methods. We also took efforts to clean the data, such as imputing NA values and "PrivacySuppressed" values. We also removed columns which were over 50 percent sparse, as these are essentially useless.. This resulted in a much sparser dataset, but one that still had a couple hundred of features (about 500 to be exact). Further dimensionality-reduction efforts are discussed later, with particular emphasis given to interpretability.
+
+Because our goal is to identify minority serving schools, we need some feature to reflect minority enrollment. This metric was created as follows:
+
+[ discuss minority metric]
+
+To determine whether or not a school underserves or adequately serves minorities, we compared the above metric to the corresponding  percantage of minorities in the US, via data we found online from [insert legitimate source]
+
+[ discuss bestvalue metric]
+
+
+From a high-level, the entire data-munging is as follows:
+
+\begin{enumerate}
+  \item Hand-select important features from data. This yielded about 500 variables.
+  \item Handle missing values or 
+  \item Create our own variables, including BEST VALUE metric
+  \item From these variables, we needed to select variables that were related to minorities. We determined these variables with FEATURE IMPORTANCE (LASSO/XGBOOST).
+\end{enumerate}
+We discuss further dimensionality-reduction efforts later, with particular emphasis given to interpretability.
+
 
 \medbreak
 We want to identify those schools that overserve or underserve minorities. Our dataset lives in very high dimensions, so our first order of business is to reduce the dimensionality. This is important because the NGO would like to understand our methods, so our model must be interpretable. We broke this up into 4 steps:
@@ -89,10 +139,6 @@ For step 3, we computed another feature importance metric, this time with our re
 \medbreak
 Step 4 is to check for correlated variables and to remove them as well.
 
-\begin{figure}[ht]
-\includegraphics[width = 75mm]{corrplot-eda}
-\end{figure}
-
 
 
 \bigbreak
@@ -109,8 +155,17 @@ We end up with a data set consisting of 110 variables. These are then sorted by 
 
 \subsection{Exploratory Data Analysis}
 
+After creating the dataset, variable relationships were analyzed with exploratory data analysis.
 
-  Plot ideas: What they reveal
+
+Correlation Plot
+
+\begin{figure}[ht]
+\includegraphics[width = 75mm]{corrplot-eda}
+\end{figure}
+
+The above correlation plot is just a small sample of our features. However, the trend remains the same: our variables feature a relatviely high-degree of correlation. Because we'll need this data for a classification task (predicting minority service), it's important to recognize this as it can effect our classification. For this reason, we use a gradient-boosted tree for our analysis, as it easily handles correlated data.
+
     
 \begin{figure}[ht]
 \includegraphics [width = 75mm]{hist-quality-index}
