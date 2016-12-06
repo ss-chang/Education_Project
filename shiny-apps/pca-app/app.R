@@ -1,7 +1,12 @@
 # =====================================================================================
 # title: app.R
 # author: Shannon Chang
-# summary: + 
+# summary: + This app will produce pca plots from a sample of fifty schools within 
+#            our main dataset and color code the plots by a specified variable.
+#          + A user can select the variable from a drop-down menu, which lists the top 
+#            ten variables of importance that we identified through our XGBOOST model.
+#          + The sidebar panel also contains a glossary that explains to the user what 
+#            each variable means. 
 # =====================================================================================
 
 
