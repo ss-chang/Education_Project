@@ -1,5 +1,5 @@
 # =====================================================================================
-# title: app.R
+# title: pca-app.R
 # author: Shannon Chang
 # summary: + This app will produce pca plots from a sample of fifty schools within 
 #            our main dataset and color code the plots by a specified variable.
@@ -32,7 +32,7 @@ library(ggthemr)
 # Load relevant data and set-up data for app
 # =====================================================================================
 # read in your file, call it "dat"
-dat                   <- read.csv("../../data/complete-data.csv", row.names = 1)
+dat                   <- read.csv("../data/complete-data.csv", row.names = 1)
 dat                   <- dat[-which(duplicated(dat$INSTNM)), ]
 rownames(dat)         <- dat$INSTNM
 random_sample_smaller <- sample(1:nrow(dat), 50, replace = FALSE)
@@ -52,7 +52,7 @@ cols_to_keep <- names(dat_eda)[names(dat_eda) %in% nonzero_columns]
 # perform pca
 pca <- prcomp(dat_eda[,cols_to_keep], scale = T)
 
-load("../../data/top_ten.RData")
+load("../data/top_ten.RData")
 
 
 
