@@ -38,12 +38,12 @@ dat_eda <- data.frame(dat_eda)
 non_zero_var <- as.vector(sapply(dat_eda, function(x) var(x) != 0))
 nonzero_columns <- names(dat_eda)[non_zero_var]
 cols_to_keep <- names(dat_eda)[names(dat_eda) %in% nonzero_columns]
-
+cols_pca <- cols_to_keep[sample(length(cols_to_keep), 50)]
 # perform pca
-pca <- prcomp(dat_eda[,cols_to_keep], scale = T)
+pca <- prcomp(dat_eda[,cols_pca], scale = T)
 
+load("../../data/top_ten.RData")
 
-xgb_10 <- c("PCTPELL", "UGDS", "HSI", "INC_PCT_H1", "REGION", "CCSIZSET", "DEP_INC_PCT_LO", "AVGFACSAL", "NOPELL_RPY_3YR_RT", "PPTUG_EF")
 
 
 # =====================================================================================
@@ -51,11 +51,39 @@ xgb_10 <- c("PCTPELL", "UGDS", "HSI", "INC_PCT_H1", "REGION", "CCSIZSET", "DEP_I
 # =====================================================================================
 
 ui <- fluidPage(
-  selectInput(inputId = "variable", 
-              label = "Select the variable you would like to investigate!", 
-              xgb_10),
-  mainPanel(
-    plotOutput("pcaPlot")
+  titlePanel("PCA Plots for Top 10 XGBOOST-Selected Variables"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(inputId = "variable", 
+                  label = "Select a top-10 variable you would like to investigate!", 
+                  top_ten),
+      h3("Variable Index"),
+      p(span("INC_PCT_H1", style = "color:blue"),
+        "is the share of students with family incomes between $75,001-$110,000 in nominal dollars."),
+      p(span("PCTPELL", style = "color:blue"),
+        "is the sample of undergraduates who receive a Pell Grant."),
+      p(span("FAMINC", style = "color:blue"),
+        "is the average family income in real 2015 dollars."), 
+      p(span("UGDS", style = "color:blue"),
+        "is the number of enrolled undergraduate certificate/degree-seeking students."),
+      p(span("REGION", style = "color:blue"),
+        "is split into U.S. Service Schools, New England (CT, ME, MA, NH, RI, VT), Mid East (DE, DC, MD, NJ, NY, PA), Great Lakes (IL, IN, MI, OH, WI), Plains (IA, KS, MN, MO, NE, ND, SD), Southeast (AL, AR, FL, GA, KY, LA, MS, NC, SC, TN, VA, WV), Southwest (AZ, NM, OK, TX), Rocky Mountains (CO, ID, MT, UT, WY), Far West (AK, CA, HI, NV, OR, WA), and Outlying Areas (AS, FM, GU, MH, MP, PR, PW, VI)."),
+      p(span("HSI", style = "color:blue"),
+        "indicates whether a school is a Hispanic-serving institution (0 for No and 1 for Yes."),
+      p(span("AVGFACSAL", style = "color:blue"),
+        "is the average faculty salary."),
+      p(span("DEP_INC_PCT_LO", style = "color:blue"),
+        "is the percentage of students who are financially independent and have family incomes between $0-30,000."),
+      p(span("MARRIED", style = "color:blue"),
+        "is the share of married students."),
+      p(span("CCSIZSET", style = "color:blue"),
+        "is the school's Carnegie Classification (size and setting).")
+      
+      ),
+    mainPanel(
+      plotOutput("pcaPlot")
+    )
   )
 )
 
@@ -68,7 +96,8 @@ server <- function(input, output) {
     autoplot(pca, data=dat_eda, colour = selectedColumn(), alpha=.6, size=3, pch=4) + 
       ggtitle(paste0("PCA of ", selectedColumn())) +
       theme_wsj() + 
-      scale_colour_gradient(limits=c(0, 1), low="goldenrod", high="navyblue", space="Lab") 
+      scale_colour_gradient(limits=c(0, 1), low="goldenrod", high="navyblue", space="Lab") + 
+      geom_text(label = dat$INSTNM)
   })
 }
 shinyApp(server = server, ui = ui) 
