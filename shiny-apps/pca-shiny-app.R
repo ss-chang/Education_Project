@@ -101,13 +101,18 @@ server <- function(input, output) {
   selectedColumn <- reactive({
     input$variable
   })
-  
+  lim1 <- reactive({
+    range(dat_eda[input$variable])[1]
+  })
+  lim2 <- reactive({
+    range(dat_eda[input$variable])[2]
+  })
   output$pcaPlot <- renderPlot({
-    autoplot(pca, data=dat_eda, colour = selectedColumn(), alpha=.6, size=8.5, pch=3) + 
+    autoplot(pca, data=dat_eda, colour = selectedColumn(), alpha=.4, size=10, pch=3) + 
       ggtitle(paste0("PCA of ", selectedColumn())) +
       theme_wsj() + 
       geom_text(label = row.names(dat_eda), size = 3) + 
-      scale_colour_gradient(limits=c(0, 1), low="goldenrod", high="navyblue", space="Lab")
+      scale_colour_gradient(limits=c(lim1(),lim2()), low="goldenrod", high="navyblue", space="Lab")
   })
 }
 shinyApp(server = server, ui = ui) 
