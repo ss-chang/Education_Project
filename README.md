@@ -269,4 +269,8 @@ MIT (see License file)
 
 The following license is for all media.   
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.  
-  
+
+## Apps
+Our two shiny web apps can also be accessed online through the following links:  
+https://shannon-s-chang.shinyapps.io/xgboost-shiny-app/  
+https://shannon-s-chang.shinyapps.io/pca-shiny-app/  
